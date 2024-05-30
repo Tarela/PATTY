@@ -44,9 +44,9 @@ To run PATTY by default parameters, you can set the following parameters:
 -   -m MODE, --mode=MODE
 Mode of PATTY, choose from sc(single-cell) or bulk
 -   -c CUTTAG, --cuttag=CUTTAG
-Input fragments file in bed format for CUT&Tag data, with .bed extension. for sc mode, the 4th(name) column of bed file represents the name of the corresponding individual cell
+Input fragments file in bed format for CUT&Tag data, with .bed extension. for sc mode, the 4th(name) column of the bed file represents the name of the corresponding individual cell
 -   -a ATAC, --atac=ATAC
-Input fragments file in bed format for ATAC-seq data, with .bed extension. The ATAC-seq fragments were used as bulk data for both sc and bulk mode. 
+Input fragments file in bed format for ATAC-seq data, with .bed extension. The ATAC-seq fragments were used as bulk data for both sc and bulk modes. 
 -   -f FACTOR, --factor=FACTOR
 Factor type of the CUT&Tag data. Currently PATTY support H3K27me3 (default) and H3K27ac
 -   -o OUTNAME, --outname=OUTNAME
@@ -92,7 +92,7 @@ PATTY sc mode implements several cell clustering methods in the single-cell clus
 PATTY also provides UMAP/t-SNE visualization for the single-cell clustering analysis. Users can activate this function by the --UMAP parameter. For the PCAkm method, the [umap](https://cran.r-project.org/web/packages/umap/index.html) package in R is required. 
 
 ## 7. Output files
-1. `NAME_summaryReports.pdf` is the summary pdf file which contains information of:
+1. `NAME_summaryReports.pdf` is the summary pdf file which contains information on:
      - Input file and parameter description
      - basic QC of the data
      - Summary of the SELMA bias estimation/correction results
@@ -141,18 +141,13 @@ You can also set the following parameters for more accurate bias estimation and 
 - -\-keeptmp  
 [optional] Whether or not to keep the intermediate results (tmpResults/)
 
-# Reproduce cell clustering results using SELMA package
-Users can reproduce one of the clustering results in the manuscript (Figure 6, Human hematopoietic cells, K-means clustering) by running SELMA with the following cmd line:
+# Reproduce cell clustering results using the PATTY package
+Users can reproduce the clustering results for the nano-CT data in the manuscript (Figure 6, H3K27me3 nano-CT data in mouse brain,  K-means clustering) by running PATTY with the following cmd line:
 ```sh
-$ SELMA -m sc -i ${path}/testdata_reads.bed.gz -g hg38 -f H3K27me3 -o testsc -t ATAC -s ${path}/hg38.2bit --SCcorrection --peakQval 0.1 --UMAP --overwrite --keeptmp --peakMaxReads 4000 --SCcorrection --cellnames ${path}/testsc_cellnames.txt
+$ PATTY -m sc -i ${path}/testdata_reads.bed.gz -f H3K27me3 -o nanoCT_H3K27me3 --UMAP --overwrite --keeptmp --cellnames ${path}/testsc_cellnames.txt
 ```
-The test files (testdata_reads.bed.gz and testsc_cellnames.txt) in the cmd line can be downloaded via the link in section 8.
+The test files (testdata_reads.bed.gz and testsc_cellnames.txt) in the cmd line can be downloaded via the link in section x.
 
-
-# Supplementary data and scripts
-- SELMA bias for [DNaseI(DNase-seq)](https://www.dropbox.com/s/ncemdhp0cee3cic/DNase_SELMAbias_10mer.txt.gz) ([backupLink](https://data.cyverse.org/dav-anon/iplant/home/tarela/SELMA/DNase_SELMAbias_10mer.txt.gz)) and [Tn5(ATAC-seq)](https://www.dropbox.com/s/x5iiy27ef80fl19/ATAC_SELMAbias_10mer.txt.gz) ([backupLink](https://data.cyverse.org/dav-anon/iplant/home/tarela/SELMA/ATAC_SELMAbias_10mer.txt.gz)). SELMA-estimated 10-mer intrinsic cleavage bias scores for DNaseI and Tn5. Both bias score matrices were generated from naked DNA data DNase/ATAC-seq data. Note that these bias matrices are already built-in and used in the SELMA package.  
-- [Footprint bias scores (FBSs) for ENCODE human consensus footprint regions](https://www.dropbox.com/s/f3m9q0fhlq4e9vc/consensusFP_biasScore.txt.gz) ([backupLink](https://data.cyverse.org/dav-anon/iplant/home/tarela/SELMA/consensusFP_biasScore.txt.gz)). The human genome-wide consensus footprint regions are from Vierstra et al., Nature. 2020 and were downloaded from [this link](http://vierstra.org/resources/dgf). SELMA footprint bias score (FBS) for each footprint region is in the last column of the file). 
-- [Other intermediate data generated and scripts used in the manuscript](https://www.dropbox.com/sh/rc0sd0x40e0dmqg/AAAgafYjM6HNYhlU185bGjjaa?dl=0). Check the README file in the folder for detailed annotation.
-- [Single cell peakXcell matrices before and after bias correction](https://www.dropbox.com/sh/v2lfv5qv6x3f4zy/AADwxqFHoH2vVCeU6ed5zDVSa?dl=0). Check the README file in the folder for detailed annotation.
-- Detailed data analysis protocol for the bias estimation and evaluation (Figure1-2) of this study can be found in https://github.com/Tarela/SELMA_data_analysis
+# Supplementary data
+- PATTY pre-trained models for [H3K27me3](https://www.dropbox.com/s/ncemdhp0cee3cic/DNase_SELMAbias_10mer.txt.gz) ([backupLink](https://data.cyverse.org/dav-anon/iplant/home/tarela/SELMA/DNase_SELMAbias_10mer.txt.gz)) and [H3K27ac](https://www.dropbox.com/s/x5iiy27ef80fl19/ATAC_SELMAbias_10mer.txt.gz) ([backupLink](https://data.cyverse.org/dav-anon/iplant/home/tarela/SELMA/ATAC_SELMAbias_10mer.txt.gz)). Both models were trained from CUT&Tag data in K562 cell line. Note that these pre-trained models are already built-in and used in the PATTY package.  
 
