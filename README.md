@@ -68,21 +68,7 @@ $ PATTY -m sc -c ${path}/testdata_scCUTTAGreads.bed.gz -a ${path}/testdata_ATACr
 $ SELMA -m bulk -c ${path}/testdata_bulkCUTTAGreads.bed.gz -a ${path}/testdata_ATACreads.bed.gz -f H3K27me3 -o testbulk 
 ```
 
-## 4. Customize candidate peaks/regions.
-PATTY provides an option (-p) to take user-supplied customized peak files as the target regions for the PATTY analysis. The required peak file should be in BED format (plain text), have >=4 columns (chrom, start, end, name), and the total length should be >= 200kbps (1k 200bp bins). By default, PATTY uses the peaks detected from the same dataset (e.g., fragments.bed file) using SICER for the peak calling (with any method) to ensure sufficient cleavages/signal on the peak regions. Below is the example with an external/customized peak file: <br />
-The test files (testdata_reads.bed.gz and testpeak.bed) in the following cmd lines can be downloaded via the link in section x
-
-\# sc mode 
-```sh
-$ PATTY -m sc -c ${path}/testdata_CUTTAGreads.bed.gz -a ${path}/testdata_ATACreads.bed.gz -p ${path}/testpeak.bed  -f H3K27me3 -o testsc  
-```
-
-\# bulk mode 
-```sh
-$ SELMA -m bulk -c ${path}/testdata_CUTTAGreads.bed.gz -a ${path}/testdata_ATACreads.bed.gz -p ${path}/testpeak.bed  -f H3K27me3 -o testbulk 
-```
-
-## 5. Pre-processing Steps for Generating the Input Fragments File
+## 4. Pre-processing Steps for Generating the Input Fragments File
 
 PATTY takes aligned fragment files in **BED format** as input. Users may apply any preferred pre-processing pipeline to generate these files. We recommend retaining only **high-quality reads** with **MAPQ > 30** to ensure accurate bias correction. Note that PATTY takes original fragments bed files as input (e.g., transformed directly from aligned BAM files, or 10x cell ranger outputed fragments.tsv file for sc data). Please don't do any customized extension or shifting. 
 
@@ -111,29 +97,34 @@ chr2    20840   21000   CellB
 > The 4th column must contain the cell barcode or cell name (like AATAACTACGCC-1).
 
 
-## 6. Install and use published single-cell clustering methods based on PATTY bias correction. 
+## 5. Install and use published single-cell clustering methods based on PATTY bias correction. 
 PATTY sc mode implements several cell clustering methods in the single-cell clustering analysis, in addition to the default K-means analysis. To activate these methods, users need to install the related package and specify the method by the --clusterMethod parameter. If a method is declared by the --clusterMethod parameter but is not installed, SELMA will skip the single-cell clustering analysis.
 
 PATTY also provides UMAP visualization for the single-cell clustering analysis. Users can activate this function by using the --UMAP parameter. For this option, the [umap](https://cran.r-project.org/web/packages/umap/index.html) package in R is required. 
 
-## 7. Output files
-1. `NAME_summaryReports.pdf` is the summary pdf file which contains information on:
-     - Input file and parameter description
-     - basic QC of the data
-     - Summary of the SELMA bias estimation/correction results
+## 6. Output Files
 
-    \#Note: This pdf file is only generated if pdflatex is pre-installed. A NAME_summaryReports.txt file is generated as well. A .tex file will also be generated in case users want to make the pdf document later.
+### 🔹 Bulk Mode Outputs
 
-2. `NAME_peaks.bed` is the peaks detected from the fragment files (using SICER). Each peak was split into 200bp bins. 
+1. `NAME_PATTYscore.bdg`  
+   A 200bp-resolution genome-wide track in **bedGraph** format containing the PATTY scores for each candidate bin.  
+   - Scores range from 0 to 1.  
+   - Regions not covered by the input are assigned a score of 0.
 
-3. `NAME_PATTYscore.bdg` (bulk mode only) is the PATTYscore for each candidate 200bp-bin, in bedGraph format. The scores are transformed into a 200bp-resolution track for the input regions. For genomic regions not covered by the input regions, PATTY will assign 0 as the score. 
+### 🔸 Single-Cell Mode Outputs
 
-4. `NAME_binXcell.txt.gz` (sc mode only) is the bin-by-cell PATTY score matrix generated from the single-cell analysis. Cells are filtered by the total reads count per cell (default >=10,000 reads, can be changed through the parameters). 
+1. `NAME_binXcell.txt.gz`  
+   A **bin-by-cell PATTY score matrix** generated from single-cell CUT&Tag analysis.  
+   - Rows: 200bp bins  
+   - Columns: individual cells  
+   - Cells with fewer than 10,000 reads (default threshold) are filtered out. This cutoff can be adjusted via parameters.
 
-5. `NAME_scClustering.txt.gz` (sc mode only) is the cell clustering result using the PATTY bias corrected matrix.
+2. `NAME_scClustering.txt.gz`  
+   The cell clustering result table based on the PATTY bias-corrected matrix.  
+   - Format: tab-delimited, with each cell's cluster label
 
 
-## 8. Testing data and example of output files
+## 9. Testing data and example of output files
 We provided the test data for users to test SELMA. The sc/bulk output can also be generated with the cmd lines in Section 3/4 using the testing data as input. Click the file names to download (copy the backupLink for cmdline download). 
 - testing data: [`Dropbox`](https://www.dropbox.com/s/9cqcrjh17cae2d4/testdata_reads.bed.gz)
 - testing peak file(optional for -p): [`Dropbox`](https://www.dropbox.com/s/a4r3gzux7v72rr9/testpeak.bed)
