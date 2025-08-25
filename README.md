@@ -85,29 +85,11 @@ $ SELMA -m bulk -c ${path}/testdata_CUTTAGreads.bed.gz -a ${path}/testdata_ATACr
 
 ## 5. Pre-processing Steps for Generating the Input Fragments File
 
-PATTY takes aligned fragment files in **BED format** as input. Users may apply any preferred pre-processing pipeline to generate these files. We recommend retaining only **high-quality reads** with **MAPQ > 30** to ensure accurate bias correction.
+PATTY takes aligned fragment files in **BED format** as input. Users may apply any preferred pre-processing pipeline to generate these files. We recommend retaining only **high-quality reads** with **MAPQ > 30** to ensure accurate bias correction. Note that PATTY takes original fragments bed files as input (e.g., transformed directly from aligned BAM files, or 10x cell ranger outputed fragments.tsv file for sc data). Please don't do any customized extension or shifting. 
 
 ### Default Input Format
 
 The expected BED format varies depending on data type:
-
-#### • Bulk CUT&Tag – Paired-End
-Paired-end data should be pre-processed into fragment-level BED format:
-
-- `chr1`, `10500`, `10646`: Chromosome, start, and end of the fragment
-- `.`: Placeholder for name
-- `60`: Mapping quality (optional)
-- `+` or `-`: Strand (optional)
-
-> Ensure duplicates are removed and only **unique fragments** are retained.
-
-#### • Bulk CUT&Tag – Single-End
-For single-end reads, convert each read into a **fixed-length fragment** (e.g., 146 bp) extending from the 5′ end:
-
-
-### 📄 Input BED Format Examples
-
-PATTY supports different input formats depending on the data type:
 
 #### • Bulk CUT&Tag (Paired-End)
 ```
@@ -117,19 +99,17 @@ chr2    20840   21000
 
 #### • Bulk CUT&Tag (Single-End)
 ```
-chr1    10500   10646
-chr2    20840   20986
+chr1    10500   10646   .   .   +
+chr2    20840   20986   .   .   -
 ```
-
-> For single-end data, each read is extended to a fixed length (e.g., 146 bp) from the 5′ end.
+> The 4-5th column represents an optional placeholder.
 
 #### • Single-Cell CUT&Tag
 ```
 chr1    10500   10646   CellA
 chr2    20840   21000   CellB
 ```
-
-> The 4th column must contain the cell barcode or cell name.
+> The 4th column must contain the cell barcode or cell name (like AATAACTACGCC-1).
 
 
 
