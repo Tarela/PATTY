@@ -44,31 +44,29 @@ $ PATTY --help  # If you see the help manual, you have successfully installed PA
 
 
 ## 2. Run PATTY (usage)
-#### Essential paramters
-To run PATTY by default parameters, you can set the following parameters:
+#### Essential parameters
+To run PATTY with the default parameters, you can set the following parameters:
 -   -m MODE, --mode=MODE
 Mode of PATTY, choose from sc(single-cell) or bulk
 -   -c CUTTAG, --cuttag=CUTTAG
-Input fragments file in bed format for CUT&Tag data, with .bed extension. for sc mode, the 4th(name) column of the bed file represents the name of the corresponding individual cell
+Input fragments file in (paired/single end) bed format for CUT&Tag data, with .bed extension. For sc mode, the 4th(name) column of the bed file represents the name/barcode of the corresponding individual cell.
 -   -a ATAC, --atac=ATAC
 Input fragments file in bed format for ATAC-seq data, with .bed extension. The ATAC-seq fragments were used as bulk data for both sc and bulk modes. 
 -   -f FACTOR, --factor=FACTOR
-Factor type of the CUT&Tag data. Currently PATTY support H3K27me3 (default) and H3K27ac
+Factor type of the CUT&Tag data. Currently PATTY support H3K27me3 (default), H3K27ac, and H3K9me3
 -   -o OUTNAME, --outname=OUTNAME
 Name of output results
--   -p PEAK, --peak=PEAK  
-[optional] external peak/region file for the candidate peaks/regions. 
 
-Example of running SELMA with default parameters:
+Example of running SELMA with default parameters (test data downloadable in :
 
 \# sc mode 
 ```sh
-$ PATTY -m sc -c ${path}/testdata_CUTTAGreads.bed.gz -a ${path}/testdata_ATACreads.bed.gz -f H3K27me3 -o testsc  
+$ PATTY -m sc -c ${path}/testdata_scCUTTAGreads.bed.gz -a ${path}/testdata_ATACreads.bed.gz -f H3K27me3 -o testsc  
 ```
 
 \# bulk mode 
 ```sh
-$ SELMA -m bulk -c ${path}/testdata_CUTTAGreads.bed.gz -a ${path}/testdata_ATACreads.bed.gz -f H3K27me3 -o testbulk 
+$ SELMA -m bulk -c ${path}/testdata_bulkCUTTAGreads.bed.gz -a ${path}/testdata_ATACreads.bed.gz -f H3K27me3 -o testbulk 
 ```
 
 ## 4. Customize candidate peaks/regions.
@@ -85,8 +83,17 @@ $ PATTY -m sc -c ${path}/testdata_CUTTAGreads.bed.gz -a ${path}/testdata_ATACrea
 $ SELMA -m bulk -c ${path}/testdata_CUTTAGreads.bed.gz -a ${path}/testdata_ATACreads.bed.gz -p ${path}/testpeak.bed  -f H3K27me3 -o testbulk 
 ```
 
-## 5. Pre-processing steps for generating the input fragments file.
-PATTY takes aligned fragment files (in .bed format) as input. Users can perform any pre-processing steps to customize the fragment files. We recommend keeping only high-quality reads with perfect alignment (e.g., MAPQ > 30) to run PATTY. For bulk data, using unique paired-end fragments (unique loci) can reduce the potential influence of PCR over-amplification. For single-cell data, users can keep only unique fragments in each individual cell.
+## 5. Pre-processing Steps for Generating the Input Fragments File
+
+PATTY takes aligned fragment files in **BED format** as input. Users may apply any preferred pre-processing pipeline to generate these files. We recommend retaining only **high-quality reads** with **MAPQ > 30** to ensure accurate bias correction.
+
+### 📄 Default Input Format
+
+The expected BED format varies depending on data type:
+
+#### • Bulk CUT&Tag – Paired-End
+Paired-end data should be pre-processed into fragment-level BED format:
+
 
 ## 6. Install and use published single-cell clustering methods based on PATTY bias correction. 
 PATTY sc mode implements several cell clustering methods in the single-cell clustering analysis in addition to the default Kmeans analysis. To activate these methods (name, version and link listed below), users need to install the related package, and specify the method by the --clusterMethod parameter. If a method is declared by the --clusterMethod parameter but is not installed, SELMA will skip the single-cell clustering analysis.
