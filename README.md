@@ -105,6 +105,33 @@ Paired-end data should be pre-processed into fragment-level BED format:
 For single-end reads, convert each read into a **fixed-length fragment** (e.g., 146 bp) extending from the 5′ end:
 
 
+### 📄 Input BED Format Examples
+
+PATTY supports different input formats depending on the data type:
+
+#### • Bulk CUT&Tag (Paired-End)
+```
+chr1    10500   10646
+chr2    20840   21000
+```
+
+#### • Bulk CUT&Tag (Single-End)
+```
+chr1    10500   10646
+chr2    20840   20986
+```
+
+> For single-end data, each read is extended to a fixed length (e.g., 146 bp) from the 5′ end.
+
+#### • Single-Cell CUT&Tag
+```
+chr1    10500   10646   CellA
+chr2    20840   21000   CellB
+```
+
+> The 4th column must contain the cell barcode or cell name.
+
+
 
 ## 6. Install and use published single-cell clustering methods based on PATTY bias correction. 
 PATTY sc mode implements several cell clustering methods in the single-cell clustering analysis in addition to the default Kmeans analysis. To activate these methods (name, version and link listed below), users need to install the related package, and specify the method by the --clusterMethod parameter. If a method is declared by the --clusterMethod parameter but is not installed, SELMA will skip the single-cell clustering analysis.
