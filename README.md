@@ -104,13 +104,13 @@ PATTY also provides UMAP visualization for the single-cell clustering analysis. 
 
 ## 6. Output Files
 
-### 🔹 Bulk Mode Outputs
+### Bulk Mode Outputs
 
 1. `NAME_PATTYscore.bdg`  
    A 200bp-resolution genome-wide track in **bedGraph** format containing the PATTY scores for each candidate bin.  
    - Scores range from 0 to 1. Higher scores indicate higher confidence of true histone mark occupancy, while lower scores reflect likely false-positive or background signals due to open chromatin bias.
 
-### 🔸 Single-Cell Mode Outputs
+### Single-Cell Mode Outputs
 
 1. `NAME_binXcell.txt.gz`  
    A **bin-by-cell PATTY score matrix** generated from single-cell CUT&Tag analysis.  
