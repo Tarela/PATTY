@@ -87,12 +87,23 @@ $ SELMA -m bulk -c ${path}/testdata_CUTTAGreads.bed.gz -a ${path}/testdata_ATACr
 
 PATTY takes aligned fragment files in **BED format** as input. Users may apply any preferred pre-processing pipeline to generate these files. We recommend retaining only **high-quality reads** with **MAPQ > 30** to ensure accurate bias correction.
 
-### 📄 Default Input Format
+### Default Input Format
 
 The expected BED format varies depending on data type:
 
 #### • Bulk CUT&Tag – Paired-End
 Paired-end data should be pre-processed into fragment-level BED format:
+
+- `chr1`, `10500`, `10646`: Chromosome, start, and end of the fragment
+- `.`: Placeholder for name
+- `60`: Mapping quality (optional)
+- `+` or `-`: Strand (optional)
+
+> Ensure duplicates are removed and only **unique fragments** are retained.
+
+#### • Bulk CUT&Tag – Single-End
+For single-end reads, convert each read into a **fixed-length fragment** (e.g., 146 bp) extending from the 5′ end:
+
 
 
 ## 6. Install and use published single-cell clustering methods based on PATTY bias correction. 
