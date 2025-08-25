@@ -7,7 +7,7 @@ Precise profiling of epigenomes is essential for better understanding chromatin 
 
 **PATTY** is a computational tool designed to correct open chromatin bias in CUT&Tag data at both **bulk** and **single-cell** levels. It leverages a pre-trained logistic regression model, built using CUT&Tag data in the K562 cell line, to correct bias for specific histone modifications.
 
-- **Bulk mode:** PATTY applies the correction model to genome-wide 200bp tiling bins, and generates a bias-corrected score ranging from 0 to 1. Higher scores indicate higher confidence of true histone mark occupancy, while lower scores reflect likely false-positive or background signals due to open chromatin bias.
+- **Bulk mode:** PATTY applies the correction model to genome-wide 200bp tiling bins, and generates a bias-corrected score on each candidate bin. 
 
 - **Single-cell mode:** PATTY performs bias correction at the individual cell level, producing a 200bp-bin by cell matrix of corrected signals. It then supports downstream cell clustering analysis using the bias-corrected data to improve biological interpretability and resolution.
 
@@ -60,12 +60,12 @@ Example of running SELMA with default parameters (test data downloadable in :
 
 \# sc mode 
 ```sh
-$ PATTY -m sc -c ${path}/testdata_scCUTTAGreads.bed.gz -a ${path}/testdata_ATACreads.bed.gz -f H3K27me3 -o testsc  
+$ PATTY -m sc -c ${path}/testdata_scCUTTAGreads.bed.gz -a ${path}/testdata_scATACreads.bed.gz -f H3K27me3 -o testsc  
 ```
 
 \# bulk mode 
 ```sh
-$ SELMA -m bulk -c ${path}/testdata_bulkCUTTAGreads.bed.gz -a ${path}/testdata_ATACreads.bed.gz -f H3K27me3 -o testbulk 
+$ SELMA -m bulk -c ${path}/testdata_bulkCUTTAGreads.bed.gz -a ${path}/testdata_bulkATACreads.bed.gz -f H3K27me3 -o testbulk 
 ```
 
 ## 4. Pre-processing Steps for Generating the Input Fragments File
@@ -108,8 +108,7 @@ PATTY also provides UMAP visualization for the single-cell clustering analysis. 
 
 1. `NAME_PATTYscore.bdg`  
    A 200bp-resolution genome-wide track in **bedGraph** format containing the PATTY scores for each candidate bin.  
-   - Scores range from 0 to 1.  
-   - Regions not covered by the input are assigned a score of 0.
+   - Scores range from 0 to 1. Higher scores indicate higher confidence of true histone mark occupancy, while lower scores reflect likely false-positive or background signals due to open chromatin bias.
 
 ### 🔸 Single-Cell Mode Outputs
 
@@ -117,21 +116,23 @@ PATTY also provides UMAP visualization for the single-cell clustering analysis. 
    A **bin-by-cell PATTY score matrix** generated from single-cell CUT&Tag analysis.  
    - Rows: 200bp bins  
    - Columns: individual cells  
-   - Cells with fewer than 10,000 reads (default threshold) are filtered out. This cutoff can be adjusted via parameters.
 
 2. `NAME_scClustering.txt.gz`  
-   The cell clustering result table based on the PATTY bias-corrected matrix.  
+   The cell clustering result is based on the PATTY bias-corrected matrix.  
    - Format: tab-delimited, with each cell's cluster label
 
 
 ## 9. Testing data and example of output files
-We provided the test data for users to test SELMA. The sc/bulk output can also be generated with the cmd lines in Section 3/4 using the testing data as input. Click the file names to download (copy the backupLink for cmdline download). 
-- testing data: [`Dropbox`](https://www.dropbox.com/s/9cqcrjh17cae2d4/testdata_reads.bed.gz)
-- testing peak file(optional for -p): [`Dropbox`](https://www.dropbox.com/s/a4r3gzux7v72rr9/testpeak.bed)
-- testing cellnames (optional for --cellnames in sc mode): [`Dropbox`](https://www.dropbox.com/s/9eb60r9xx7gbh13/testsc_cellnames.txt)
+We provided the test data for users to test PATTY. The sc/bulk output can also be generated with the command lines in Section 2 using the testing data as input. Click the file names to download. 
+- testing data for **bulk** mode:
+   - H3K27me3 [`Dropbox`](https://www.dropbox.com/s/9cqcrjh17cae2d4/testdata_bulkCUTTAGreads.bed.gz)
+   - ATAC [`Dropbox`](https://www.dropbox.com/s/9cqcrjh17cae2d4/testdata_bulkATACreads.bed.gz)
+- testing data for **sc** mode:
+   - H3K27me3 [`Dropbox`](https://www.dropbox.com/s/9cqcrjh17cae2d4/testdata_scCUTTAGreads.bed.gz)
+   - ATAC [`Dropbox`](https://www.dropbox.com/s/9cqcrjh17cae2d4/testdata_scATACreads.bed.gz)
 - output for PATTY **bulk** mode with testing data input: [`Dropbox`](https://www.dropbox.com/sh/x8f29ao73t5ka8a/AADPjRgtgmW0DXJTiPMYWIS-a?dl=0)
 - output for PATTY **sc** mode with testing data input: [`Dropbox`](https://www.dropbox.com/sh/jl7a28w9a984tpz/AACoGYzLRnBwZLgmbGlu6bwSa?dl=0) 
-- The PATTY with testing data (e.g., using sc mode) will be finished within 30 minutes.
+- The PATTY with testing data (e.g., using sc mode) will be finished within 60 minutes.
 
 
 ## 9. Other parameters in the PATTY pipeline
