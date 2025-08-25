@@ -17,7 +17,7 @@ v1.0.0 First version of PATTY with both bulk and single-cell(sc) mode.
 
 ## 1. Installation
 - Package requirements<br>
-PATTY requires [Python](https://www.python.org) 3.6+ to run.<br>
+PATTY requires [Python](https://www.python.org) 3.6+ and [Rscript](https://www.r-project.org) v3+ to run.<br>
 PATTY requires Python packages [scipy](https://scipy.org) and [numpy](https://numpy.org) pre-installed.
 
 \# for root user
@@ -38,7 +38,6 @@ $ PATTY --help  # If you see the help manual, you have successfully installed PA
 
 \# NOTE: 
 - To install PATTY on MacOS, the users need to download and install Command Line Tools beforehand
-- PATTY requires python3 packages [scipy](https://scipy.org) and [numpy](https://numpy.org) pre-installed. 
 - Bedtools (Quinlan et al., Bioinformatics, 2010) and UCSC tools (Kuhn et al., Brief Bioinform. 2013) are recommended if users want to generate bigwig tracks for bias-corrected data. 
 - The installation should be finished in about one minute.
 
@@ -112,14 +111,10 @@ chr2    20840   21000   CellB
 > The 4th column must contain the cell barcode or cell name (like AATAACTACGCC-1).
 
 
-
 ## 6. Install and use published single-cell clustering methods based on PATTY bias correction. 
-PATTY sc mode implements several cell clustering methods in the single-cell clustering analysis in addition to the default Kmeans analysis. To activate these methods (name, version and link listed below), users need to install the related package, and specify the method by the --clusterMethod parameter. If a method is declared by the --clusterMethod parameter but is not installed, SELMA will skip the single-cell clustering analysis.
-- Seurat (required packages: [ArchR v1.0.1](https://satijalab.org/seurat/), [tabix](http://www.htslib.org/doc/tabix.html), and [bgzip](http://www.htslib.org/doc/bgzip.html))
-- scran (required packages: [ArchR v1.0.1](https://satijalab.org/seurat/), [tabix](http://www.htslib.org/doc/tabix.html), and [bgzip](http://www.htslib.org/doc/bgzip.html))
-- APEC (required package: [APEC v1.2.2](https://github.com/QuKunLab/APEC))
+PATTY sc mode implements several cell clustering methods in the single-cell clustering analysis, in addition to the default K-means analysis. To activate these methods, users need to install the related package and specify the method by the --clusterMethod parameter. If a method is declared by the --clusterMethod parameter but is not installed, SELMA will skip the single-cell clustering analysis.
 
-PATTY also provides UMAP/t-SNE visualization for the single-cell clustering analysis. Users can activate this function by the --UMAP parameter. For the PCAkm method, the [umap](https://cran.r-project.org/web/packages/umap/index.html) package in R is required. 
+PATTY also provides UMAP visualization for the single-cell clustering analysis. Users can activate this function by using the --UMAP parameter. For this option, the [umap](https://cran.r-project.org/web/packages/umap/index.html) package in R is required. 
 
 ## 7. Output files
 1. `NAME_summaryReports.pdf` is the summary pdf file which contains information on:
