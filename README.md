@@ -137,20 +137,16 @@ We provided the test data for users to test PATTY. The sc/bulk output can also b
 
 ## 9. Other parameters in the PATTY pipeline
 You can also set the following parameters for more accurate bias estimation and correction:
-- -\-cellnames=CELLNAMES  
-[sc optional] Single column file for name list of used individual cells, each line contains the name of an individual cell. This parameter is only used for sc mode. This parameter is not used very commonly. 
+- -\-binMinReads=BINMINREADS  
+[optional] Bins with < 5(default) reads covered will be discarded in the analysis. For sc mode, bins with a total of < 5 (default) reads across all high-quality cells will be discarded. 
 - -\-readCutoff=READCUTOFF  
-[sc optional] Reads number cutoff for high-quality cells. Cells with < 10000(default) reads will be discarded in the analysis. Users can change this parameter for samples with low sequencing depth to include more cells in the analysis. Setting a lower number for this parameter will possibly decrease the accuracy of clustering results due to the low-quality cells. 
-- -\-peakMinReads=PEAKMINREADS  
-[sc optional] Peaks with < 10(default) cleavages covered (across all high-quality cells) will be discarded in the analysis.
-- -\-peakMaxReads=PEAKMAXREADS  
-[sc optional] Peaks with > X cleavages covered (across all high-quality cells) will be discarded in the analysis. Set 0 to close this function (default)
+[sc optional] Reads number cutoff for high-quality cells. Cells with < 10000(default) reads will be discarded in the analysis. Users can change this parameter for samples with low sequencing depth to include more cells in the analysis. Setting a lower number for this parameter may decrease the accuracy of clustering results due to the low-quality cells. 
+- -\-binMaxReads=BINMAXREADS  
+[sc optional] Bins with > X cleavages covered (across all high-quality cells) will be discarded in the analysis. Set 0 to close this function (default)
 - -\-clusterMethod=CLUSTERMETHOD  
-[sc optional] Method used for single-cell clustering analysis. The default is Kmeans(PCA dim reduction + K-means clustering). Optional choices (Seurat, scran, and APEC) require related packages installed (described in section x)
+[sc optional] Method used for single-cell clustering analysis. The default is K-means (PCA dim reduction + K-means clustering). Optional choices (Seurat and scran) require related packages installed (described in section x)
 - -\-clusterNum=CLUSTERNUM  
 [sc optional] Number of clusters specified for K-means clustering and only used for the PCAkm (setting by --clusterMethod) method. The default is 7. 
-- -\-topDim=TOPDIM  
-[sc optional] Number of dimensions (with highest Variance) used for clustering. Only used for PCAkm(PC) and ArchR (Latent variable). This number is suggested to be >=30 (deafult=60)
 - -\-UMAP  
 [sc optional] Turn on this parameter to generate a UMAP plot for the clustering results
 - -\-overwrite  
@@ -159,12 +155,14 @@ You can also set the following parameters for more accurate bias estimation and 
 [optional] Whether or not to keep the intermediate results (tmpResults/)
 
 # Reproduce cell clustering results using the PATTY package
-Users can reproduce the clustering results for the nano-CT data in the manuscript (Figure 6, H3K27me3 nano-CT data in mouse brain,  K-means clustering) by running PATTY with the following cmd line:
+Users can reproduce the bulk correction data in the manuscript (Figure 4, H3K27me3 CUT&Tag data in K562) by running PATTY with the following command line:
 ```sh
-$ PATTY -m sc -i ${path}/testdata_reads.bed.gz -f H3K27me3 -o nanoCT_H3K27me3 --UMAP --overwrite --keeptmp --cellnames ${path}/testsc_cellnames.txt
+$ PATTY -m bulk -c ${path}/testdata_bulkCUTTAGreads.bed.gz -a ${path}/testdata_bulkATACreads.bed.gz -f H3K27me3 -o K562_H3K27me3 --UMAP --overwrite --keeptmp 
 ```
-The test files (testdata_reads.bed.gz and testsc_cellnames.txt) in the cmd line can be downloaded via the link in section x.
+Users can reproduce the clustering results for the nano-CT data in the manuscript (Figure 7, H3K27me3 nano-CT data in mouse brain,  K-means clustering) by running PATTY with the following command line:
+```sh
+$ PATTY -m sc -c ${path}/testdata_scCUTTAGreads.bed.gz -a ${path}/testdata_scATACreads.bed.gz -f H3K27me3 -o nanoCT_H3K27me3 --UMAP --overwrite --keeptmp 
+```
+The test data in the command line can be downloaded via the link in section 9.
 
-# Supplementary data
-- PATTY pre-trained models for [H3K27me3](https://www.dropbox.com/s/ncemdhp0cee3cic/DNase_SELMAbias_10mer.txt.gz) ([backupLink](https://data.cyverse.org/dav-anon/iplant/home/tarela/SELMA/DNase_SELMAbias_10mer.txt.gz)) and [H3K27ac](https://www.dropbox.com/s/x5iiy27ef80fl19/ATAC_SELMAbias_10mer.txt.gz) ([backupLink](https://data.cyverse.org/dav-anon/iplant/home/tarela/SELMA/ATAC_SELMAbias_10mer.txt.gz)). Both models were trained from CUT&Tag data in K562 cell line. Note that these pre-trained models are already built-in and used in the PATTY package.  
 
