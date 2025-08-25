@@ -3,23 +3,29 @@
 Precise profiling of epigenomes is essential for better understanding chromatin biology and gene regulation. Cleavage Under Targets & Tagmentation (CUT&Tag) is an easy and low-cost epigenomic profiling technique that can be performed on a low number of cells and at the single-cell level. With its growing adoption, CUT&Tag datasets spanning diverse biological systems are rapidly accumulating in the field. CUT&Tag assays use the hyperactive transposase Tn5 for DNA tagmentation. Tn5’s preference toward accessible chromatin alters CUT&Tag sequence read distributions in the genome and introduces open chromatin bias that can confound downstream analysis, an issue more substantial in sparse single-cell data. We show that open chromatin bias extensively exists in published CUT&Tag datasets, including those generated with recently optimized high-salt protocols. To address this challange, we present PATTY (Propensity Analyzer for Tn5 Transposase Yielded bias), a comprehensive computational method that corrects open chromatin bias in CUT&Tag data by leveraging accompanying ATAC-seq. By integrating transcriptomic and epigenomic data using machine learning and integrative modeling, we demonstrate that PATTY enables accurate and robust detection of occupancy sites for both active and repressive histone modifications, including H3K27ac, H3K27me3, and H3K9me3, with experimental validation. We further develop a single-cell CUT&Tag analysis framework built on PATTY and show improved cell clustering when using bias-corrected single-cell CUT&Tag data compared to using uncorrected data. Beyond CUT&Tag, PATTY sets a foundation for further development of bias correction methods for improving data analysis for all Tn5-based high-throughput assays.
 
 
-## 0. Introduction of PATTY package
-PATTY performs correction of open chromatin bias of CUT&Tag data at both bulk and single-cell levels. PATTY pre-estimated the open chromatin bias and pre-trained the correction model for a given type of histone modification using CUT&Tag data in the K562 cell line, then applied the pre-trained model on the bulk/sc CUT&Tag data. For bulk data, SELMA estimates the bias expected cleavages on chromatin accessibility regions (peaks) and compares with observed cleavages. For single-cell data, SELMA estimates the summarized bias score on each candidate chromatin accessibility region (peak bias score, PBS) and uses the peaks with low PBS for single-cell clustering analysis.
+## 0. Introduction to the PATTY Package
+
+**PATTY** is a computational tool designed to correct open chromatin bias in CUT&Tag data at both **bulk** and **single-cell** levels. It leverages a **pre-trained logistic regression model**, built using CUT&Tag data in the K562 cell line, to correct bias for specific histone modifications.
+
+- **Bulk mode:** PATTY applies the correction model to genome-wide 200bp tiling bins, generating a bias-corrected score ranging from 0 to 1. Higher scores indicate higher confidence of true histone mark occupancy, while lower scores reflect likely false-positive or background signals due to open chromatin bias.
+
+- **Single-cell mode:** PATTY performs bias correction at the individual cell level, producing a **200bp-bin by cell matrix** of corrected signals. It then supports downstream **cell clustering analysis** using the bias-corrected data to improve biological interpretability and resolution.
+
 
 - Changelog<br>
-v1.0.0 First version of PATTY with both single-cell(sc) and bulk mode.
+v1.0.0 First version of PATTY with both bulk and single-cell(sc) mode.
 
 ## 1. Installation
 - Package requirements<br>
-PATTY requires [python](https://www.python.org) 3.6+ and [Rscript](https://www.r-project.org) v3+ to run.<br>
-PATTY requires python3 packages [numpy](https://numpy.org) pre-installed.
+PATTY requires [Python](https://www.python.org) 3.6+ to run.<br>
+PATTY requires Python packages [scipy](https://scipy.org) and [numpy](https://numpy.org) pre-installed.
 
 \# for root user
 ```sh
 $ cd PATTY
 $ sudo python setup.py install  
 ```
-\# if you are not root user, you can install PATTY at a specific location where you have the write permission
+\# if you are not the root user, you can install PATTY at a specific location where you have write permission
 ```sh
 $ python setup.py install --prefix /home/PATTY  # Here you can replace “/home/PATTY” with any location 
 $ export PATH=/home/PATTY/bin:$PATH    # setup PATH for the software
@@ -32,9 +38,8 @@ $ PATTY --help  # If you see the help manual, you have successfully installed PA
 
 \# NOTE: 
 - To install PATTY on MacOS, the users need to download and install Command Line Tools beforehand
-- PATTY requires python3 packages [numpy](https://numpy.org) pre-installed. 
-- Bedtools (Quinlan et al., Bioinformatics. 2010) and UCSC tools (Kuhn et al., Brief Bioinform. 2013) are recommended for data pre-processing. The PATTY package will install both tools automatically if the users does not have them pre-installed in the default PATH. 
-- Some functions (single-cell clustering) of SELMA require the related packages pre-installed (see Section 4)
+- PATTY requires python3 packages [scipy](https://scipy.org) and [numpy](https://numpy.org) pre-installed. 
+- Bedtools (Quinlan et al., Bioinformatics, 2010) and UCSC tools (Kuhn et al., Brief Bioinform. 2013) are recommended if users want to generate bigwig tracks for bias-corrected data. 
 - The installation should be finished in about one minute.
 
 
