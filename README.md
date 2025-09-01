@@ -5,7 +5,7 @@ Precise profiling of epigenomes is essential for better understanding chromatin 
 
 ## 0. Introduction to the PATTY Package
 
-**PATTY** is a computational tool designed to correct open chromatin bias in CUT&Tag data at both **bulk** and **single-cell** levels. It leverages a pre-trained logistic regression model, built using CUT&Tag data in the K562 cell line, to correct bias for specific histone modifications.
+**PATTY** is a computational tool designed to correct open chromatin bias in CUT&Tag data at both **bulk** and **single-cell** levels. Current version of PATTY support open chromatin bias correction for H3K27me3, H3K27ac, and H3K9me3. It leverages a pre-trained logistic regression model, built using CUT&Tag data in the K562 cell line, to correct bias for specific histone modifications.
 
 - **Bulk mode:** PATTY applies the correction model to genome-wide 200bp tiling bins, and generates a bias-corrected score on each candidate bin. 
 
