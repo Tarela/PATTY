@@ -57,14 +57,7 @@ def detect_memory():
     except:
         return 'NA'
 
-
-def pdf_name(input_name):
-    '''
-    Change filename to pdf file name
-    '''
-    outputname = "_".join(input_name.split('.')[:-1])+".pdf"
-    return outputname
-    
+  
 def wlog(message,logfile):
     '''
     print a message and write the message to logfile
@@ -224,138 +217,6 @@ def filter_highQcell_reads(outname,cutoff,usecells):
     outf.close()
     inf.close()
     return [finalcell, len(usehighQcells), highQreadnum,len(cell_reads.keys()),usetag]
-
-def readBias(bgmatrix):
-    pBG = {}
-    if bgmatrix.endswith(".gz"):
-        inf = gzip.open(bgmatrix,mode="rb")
-        for line in inf:
-            ll = line.decode("ascii").strip().split("\t")
-            name = ll[0]
-            pBG[name] = float(ll[1])
-        inf.close()
-    else:
-        inf = open(bgmatrix)
-        for line in inf:
-            ll = line.strip().split("\t")
-            name = ll[0]
-            pBG[name] = float(ll[1])
-        inf.close()
-    return pBG
-
-def rev(seq):
-    revseq = ""
-    for i in seq[::-1]:
-        if i == 'A':
-            r = 'T'
-        elif i == 'T':
-            r = 'A'
-        elif i == 'C':
-            r = 'G'
-        elif i == 'G':
-            r = 'C'
-        else:
-            r=i#print i
-        revseq += r
-    return revseq
-
-def make_nmer_dict(n):
-    nmer_seq = {}
-    bp = ['A','C','G','T']
-    allseq = [0]*n
-    allseq[0] = bp
-    i=1
-    while i < n:
-        allseq[i] = []
-        for previous_seq in allseq[i-1]:
-            for add_bp in bp:
-                new_seq = previous_seq + add_bp
-                allseq[i].append(new_seq)
-        i += 1
-    for seq in allseq[n-1]:
-        nmer_seq[seq] = 0
-    del allseq
-    return nmer_seq
-
-def naive_kmerBias_chrM(outname,seq2bit,kmer,twoBitToFaTool,dataformat):
-    flank = int(int(kmer)/2)
-    pcut = make_nmer_dict(int(kmer))
-    bgseq = make_nmer_dict(int(kmer))
-    chrMseq = sp("%s %s:chrM stdout"%(twoBitToFaTool,seq2bit))[0].decode("ascii").replace("\n","").lstrip(">chrM")
-
-    for i in range(len(chrMseq)):
-        subseq = chrMseq[(i-flank):(i+flank)]
-        if subseq in bgseq:
-            bgseq[subseq]+=1
-
-    inf = open(outname +"_chrM.bed")
-    for line in inf:
-        ll = line.strip().split("\t")
-        if dataformat == "PE" or ll[5] == '+' :
-            seq = chrMseq[(int(ll[1])-flank):(int(ll[1])+flank)]#.upper()
-            if seq in pcut:
-                pcut[seq]+=1
-            else:
-                pass
-        if dataformat == "PE" or ll[5] == '-' :
-            seq = rev(chrMseq[(int(ll[2])-flank):(int(ll[2])+flank)])#.upper())
-            if seq in pcut:
-                pcut[seq]+=1
-            else:
-                pass
-    inf.close()        
-
-    naiveBias = {}
-    for seqtype in sorted(pcut.keys()):
-        if bgseq[seqtype] == 0:
-            pbias = -1
-        else:  
-            pbias = float(pcut[seqtype])/float(bgseq[seqtype])
-        naiveBias[seqtype]=pbias
-    return naiveBias
-
-def extsummit(summitfile,outfile,extsize):
-    peakcount = 0
-    inf = open(summitfile)
-    outf = open(outfile,'w')
-    for line in inf:
-        ll = line.strip().split("\t")
-        if ll[0] != "chrM":
-            peakcount += 1
-            newll = [ll[0], max(0,int(ll[1])-extsize), int(ll[1])+extsize, ll[3],ll[4]]
-            outf.write("\t".join(map(str,newll))+"\n")
-    inf.close()
-    outf.close()
-    return peakcount
-
-def extExternal(peakfile,outfile,extsize):
-    peakcount = 0
-    inf = open(peakfile)
-    outf = open(outfile,'w')
-    for line in inf:
-        ll = line.strip().split("\t")
-        if ll[0] != "chrM":
-            peakcount += 1
-            peakcenter = int((int(ll[1]) + int(ll[2]))/2)
-            newll = [ll[0], max(0,peakcenter-extsize), peakcenter+extsize, "extPeak%s"%peakcount,"1"]
-            outf.write("\t".join(map(str,newll))+"\n")
-    inf.close()
-    outf.close()
-    return peakcount
-
-def fetchseq_2bit(twoBitToFaTool,seq2bit,chrm,start,end):
-    result = sp("%s %s:%s:%s-%s stdout"%(twoBitToFaTool,seq2bit,chrm,start,end))[0].decode("ascii").strip().split("\n")
-    if len(result) >=2:
-        return "".join(result[1:]).upper()
-    else:
-        return "NA"
-
-def fetchseq_2bit_chrom(twoBitToFaTool,seq2bit,chrm):
-    result = sp("%s %s:%s stdout"%(twoBitToFaTool,seq2bit,chrm))[0].decode("ascii").strip().split("\n")
-    if len(result) >=2:
-        return "".join(result[1:]).upper()
-    else:
-        return "NA"
 
 
 def fetchsignal_bw(bwsum,bwfile,chrm,start,end):
@@ -885,19 +746,6 @@ def readAnnotation(annotation):
     return outdict
     
      
-def textformat(inp):
-    '''
-    transfer 1000000 to  1,000,000 for better visualization in output report
-    '''
-    o = ''
-    comma = 0
-    for i in (inp[::-1]):
-        comma += 1
-        o += i
-        if comma%3 == 0:
-            o += ','
-    return o[::-1].strip(',')
-
 def createDIR(dirname):
     '''
     check dir name and create new dir
@@ -905,11 +753,4 @@ def createDIR(dirname):
     if not os.path.isdir(dirname):
         os.system('mkdir %s'%(dirname))
 
-def strlatexformat(instr):
-    instr = str(instr)
-    outstr = instr.replace('_','\_')
-    return(outstr)
-    
-
-            
        

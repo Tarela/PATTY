@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-# Time-stamp: <2022-06-01 12:08:55 Shengen Hu>
+# Time-stamp: <2025-06-01 12:08:55 Shengen Hu>
  
 """Description: software package for "SELMA: a computational framework for modeling intrinsic biases in chromatin accessibility sequencing data"
-Copyright (c) 2022 Shengen Hu <tarelahu@gmail.com>
+Copyright (c) 2025 Shengen Hu <tarelahu@gmail.com>
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included with
 the distribution).
@@ -30,11 +30,8 @@ import time
 
 ### tool function
 from SELMApipe.Utility import (sp,
-                    pdf_name,
                     raise_error,
                     wlog,
-                    readAnnotation,
-                    textformat,
                     CMD
                     )
                                    
@@ -44,12 +41,12 @@ from SELMApipe.Utility import (sp,
 
 from SELMApipe.step0_check_data import step0_check_data
 from SELMApipe.step1_QC_format import step1_QC_format
-from SELMApipe.step2_biasMat import step2_biasMat
-from SELMApipe.step3_callpeak import step3_callpeak
-from SELMApipe.step4_BULKcleavageBias import step4_BULKcleavageBias
-from SELMApipe.step4_SCpeakbias import step4_SCpeakbias
-from SELMApipe.step5_SCcellClustering import step5_SCcellClustering
-from SELMApipe.stepFinal_summary import stepFinal_summary
+#from SELMApipe.step2_BULKscanSig import step2_BULKscanSig
+#from SELMApipe.step3_BULKcorrect import step3_BULKcorrect
+#from SELMApipe.step2_SCscanSig import step2_SCscanSig
+#from SELMApipe.step3_SCcorrect import step3_SCcorrect
+#from SELMApipe.step4_SCcellClustering import step4_SCcellClustering
+#from SELMApipe.stepFinal_summary import stepFinal_summary
 
 # ------------------------------------
 # read in parameters
@@ -67,49 +64,29 @@ def main():
 
 #========major options=============
     optparser.add_option("-m","--mode",dest="mode",type="choice",choices=("sc","bulk"),
-                             help = "[required] Mode of SELMA, choose from sc(single-cell) or bulk")
-    optparser.add_option("-i","--input_fragments", dest = 'fragments',type="str",
-                             help = "[required] Input fragments file in bed format, with .bed extension (or .bed.gz for comparessed file), for sc mode, the 4th(name) column of bed file represents the name of the corresponded individual cell" )
-    optparser.add_option("-f","--format",dest='format',type="choice",choices=("PE","SE"),default="PE",
-                             help = "[required] Format of the fragments.bed file. choose from PE(paired-end, default) or SE(single-end)" )
-    optparser.add_option("-t","--datatype",dest='datatype',type="choice",choices=("ATAC","DNase"),
-                             help = "[required] Type of sequencing data (experiments), choose from ATAC or DNase" )
+                             help = "[required] Mode of PATTY, choose from bulk or sc(single-cell)")
+    optparser.add_option("-c","--cuttag", dest = 'cuttag',type="str",
+                             help = "[required] CUTTAG Input fragments file in (paired/single end) bed format for CUT&Tag data, with .bed extension (or .bed.gz for comparessed file). For sc mode, the 4th(name) column of the bed file represents the name/barcode of the corresponding individual cell" )
+    optparser.add_option("-a","--atac", dest = 'atac',type="str",
+                             help = "[required] ATAC Input fragments file in bed format for ATAC-seq data, with .bed extension(or .bed.gz for comparessed file). The ATAC-seq fragments were used as bulk data for both sc and bulk modes (only chrm,start,end 3columns are required)" )
+    optparser.add_option("-f","--factor",dest='factor',type="choice",choices=("H3K27me3","H3K27ac","H3K9me3"),
+                             help = "[required] FACTOR Factor type of the CUT&Tag data. Currently PATTY support H3K27me3 (default), H3K27ac, and H3K9me3" )
     optparser.add_option("-g","--genome",dest='genome',type="str",default="hg38",
-                             help = "[required] genome version of the input data, default is hg38" )
-    optparser.add_option("-s","--sequence",dest='sequence',type="str",
-                             help = "[required] genome sequence file in 2bit format" )
+                             help = "[required] genome version of the input data, choose from hg38 (default) and mm10" )
     optparser.add_option("-o","--outname", dest="outname",type="str",
                              help = "[required] Name of output results" )
 
 #========minor options============= 
-    optparser.add_option("-p","--peak",dest="peak",type="str",
-                         help="[optional] external peak file. This parameter require a peak file in .bed format (>=4 column: chrom,start,end,peakname) and >=1000 peaks in the peakfile. if this parameter (-p) is inputted, SELMA will use the inputted peak file instead of the peak detected by the fragments(-i). Note that we strongly suggest to use the peak file detected with the same fragments.bed file to make sure there are enough cleavages/signal on the peak regions.")
-    optparser.add_option("--extend",dest="extend",type="int",default=200,
-                         help="[optional] Extension size from the peak summits(centers for external peaks), default is +/- 200bp from each peak summit.")
-    optparser.add_option("--peakQval",dest="peakqval",type="float",default=0.01,
-                         help="[optional] Qvalue cutoff in macs3 peak calling, default is 0.01 (-q 0.01)")
-    optparser.add_option("--bias",dest="bias",type="choice",default="naked",choices=("naked","chrM"),
-                         help="[optional] Methods of intrinsic cleavage bias estimation, choose from naked (default, use SELMA pre-estimated bias model from naked DNA data) or chrM (use cleavages on mtDNA to estimate bias)")
-    optparser.add_option("--kmer",dest="kmer",type="choice",default='10',choices=('6','8','10'),
-                         help="[optional] Length of K (K-mer length), choose from 6,8,and 10(default)")
-    optparser.add_option("--SCcorrection",dest="SCcorrection",default=False, action='store_true', 
-                         help="[sc optional] Apply SELMA bias correction model to the scATAC-seq data.")
-#    optparser.add_option("--SCmodel",dest="SCmodel",type="choice",default="beta1",choices=("linear","normal1","normal2","beta1","beta2","beta3"),
-#                         help="[sc optional] SELMA bias correction model for scATAC-seq data. Choose from linear, normal1, normal2, beta1(default), beta2, or beta3. This parameter is ignored when --SCcorrection is deactivated")
-    optparser.add_option("--scATAC10x",dest="scATAC10x",default=False, action='store_true', 
-                         help="[sc optional] Turn on this parameter to use 10x scATAC mode, in which the data format is assume to be PE and the reads 5'end will be shift back to represent the cleavage sites  ")
+    optparser.add_option("--binMinReads",dest="binminreads",type="str",default="5",
+                         help="[optional] Bins with < 5(default) reads covered will be discarded in the analysis. For sc mode, bins with a total of < 5 (default) reads across all high-quality cells will be discarded. set 0 to turn off this parameter")
+    optparser.add_option("--binList",dest="binlist",type="str",
+                         help="[optional] Bed file for inputting candidate bins/peaks for the analysis. When inputted, the correction will be done in only these bins for bulk mode. The correction/clustering will be only done these bins for sc mode. This parameter is designed for customized high-reads bin (bulk mode) or high-var bin (sc mode). The inputed peaks/bins will be transformed/splited to 200bp bins for as the input")
+#    optparser.add_option("--peakCutoff",dest="peakcutoff",type="float",default=0,
+#                         help="[optional] set a cutoff to perform peak calling")
     optparser.add_option("--cellnames",dest="cellnames",type="str",
                          help="[sc optional] Single column file for name list of used individual cells, each line contain the name of the individual cell. This parameter is only used for sc mode")
     optparser.add_option("--readCutoff",dest="readcutoff",type="int",default=10000,
-                         help="[sc optional] Reads number cutoff for high quality cells. Cells with < 10000(default) reads will be discarded in the analysis")
-    optparser.add_option("--lowBiasPeak",dest="lowbiaspeak",type="int",default=80,
-                         help="[sc optional] This parameter is ignored/deactivated if --SCcorrection is set. Use top% peaks with less bias effect(lowest peak bias score, PBS). Default is 80 (80%, use top 4/5 peaks with lowest bias for single-cell analysis).")
-    optparser.add_option("--peakMinReads",dest="peakminreads",type="str",default="10",
-                         help="[sc optional] peaks with < 10(default) cleavages covered will be discarded.")
-    optparser.add_option("--peakMaxReads",dest="peakmaxreads",type="str",default="0",
-                         help="[sc optional] peaks with > X cleavages covered will be discarded in the cell clustering analysis. Set 0 to close this function (default)")
-#    optparser.add_option("--clusterMethod",dest="clustermethod",type="choice",default="PCAkm",choices=("PCAkm","Seurat","ArchR","APEC","Cicero"),
-#                         help="[sc optional] Method used for single cell clustering analysis. Default is PCAkm(PCA dim reduction + K+means clustering. Optional choices (Seurat,ArchR,APEC,Cicero) require related packages installed")
+                         help="[sc optional] Reads number cutoff for high quality cells. Cells with < 10000(default) reads will be discarded in the analysis. Set 0 to turn off this parameter")
     optparser.add_option("--clusterMethod",dest="clustermethod",type="choice",default="Kmeans",choices=("Kmeans","Seurat","APEC","scran"),
                          help="[sc optional] Method used for single cell clustering analysis. Default is Kmeans(PCA dim reduction + K-means clustering. Optional choices (Seurat,scran,APEC) require related packages installed")
     optparser.add_option("--clusterNum",dest="clusterNum",type="int",default=10,

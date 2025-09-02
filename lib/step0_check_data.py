@@ -22,9 +22,7 @@ from SELMApipe.Utility import (sp,
                     raise_error,
                     wlog,
                     ewlog,
-                    fetchseq_2bit_chrom,
                     checkbedformat,
-                    textformat,
                     CMD
                     )
 
