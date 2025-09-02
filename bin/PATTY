@@ -29,7 +29,7 @@ import time
 # ------------------------------------
 
 ### tool function
-from SELMApipe.Utility import (sp,
+from PATTYpipe.Utility import (sp,
                     raise_error,
                     wlog,
                     CMD
@@ -39,14 +39,14 @@ from SELMApipe.Utility import (sp,
 # main step
 # -------------------
 
-from SELMApipe.step0_check_data import step0_check_data
-from SELMApipe.step1_QC_format import step1_QC_format
-#from SELMApipe.step2_BULKscanSig import step2_BULKscanSig
-#from SELMApipe.step3_BULKcorrect import step3_BULKcorrect
-#from SELMApipe.step2_SCscanSig import step2_SCscanSig
-#from SELMApipe.step3_SCcorrect import step3_SCcorrect
-#from SELMApipe.step4_SCcellClustering import step4_SCcellClustering
-#from SELMApipe.stepFinal_summary import stepFinal_summary
+from PATTYpipe.step0_check_data import step0_check_data
+from PATTYpipe.step1_QC_format import step1_QC_format
+from PATTYpipe.step2_BULKscanSig import step2_BULKscanSig
+from PATTYpipe.step3_BULKcorrect import step3_BULKcorrect
+from PATTYpipe.step2_SCscanSig import step2_SCscanSig
+from PATTYpipe.step3_SCcorrect import step3_SCcorrect
+from PATTYpipe.step4_SCcellClustering import step4_SCcellClustering
+from PATTYpipe.stepFinal_summary import stepFinal_summary
 
 # ------------------------------------
 # read in parameters
@@ -56,10 +56,10 @@ def main():
     '''
     Read parameter 
     '''
-    usage = "%prog -m sc -i input_fragments.bed -f PE -t ATAC -g hg38 -s hg38.2bit -o outname "
-    description = """SELMA: a computational framework for modeling intrinsic biases in chromatin accessibility sequencing data"""
+    usage = "%prog -m bulk -a CUTTag.bed -a ATAC -f H3K27me3 -g hg38 -o outname "
+    description = """PATTY: a computational method for correcting open chromatin bias in bulk and single-cell CUT&Tag data"""
 
-    optparser = OptionParser(version="%prog 1.0.1",description=description,usage=usage,add_help_option=False)
+    optparser = OptionParser(version="%prog 1.0.0",description=description,usage=usage,add_help_option=False)
     optparser.add_option("-h","--help",action="help",help="Show this help message and exit.")
 
 #========major options=============
