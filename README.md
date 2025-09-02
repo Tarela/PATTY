@@ -129,7 +129,6 @@ We provided the test data for users to test PATTY. The sc/bulk output can also b
    - ATAC [`Dropbox`](https://www.dropbox.com/scl/fi/tlb9tzn32ykwzlh19znch/testdata_sc_ATAC_reads.bed.gz)
 - output for PATTY **bulk** mode using bulk-testing data input: [`Dropbox`](https://www.dropbox.com/scl/fi/597k0encidxcxr02m5db7/testdata_bulk_H3K27me3_PATTYcorrect.bw)
 - output for PATTY **sc** mode using sc-testing data input: [`Dropbox`](https://www.dropbox.com/scl/fi/8t5cjaani27tgs82lfpcr/testdata_sc_H3K27me3_clustering.txt.gz) 
-- The PATTY with testing data (e.g., using sc mode) will be finished within 60 minutes.
 
 
 ## 7. Other parameters in the PATTY pipeline
@@ -153,7 +152,7 @@ You can also set the following parameters for more accurate bias estimation and 
 - -\-keeptmp  
 [optional] Whether or not to keep the intermediate results (tmpResults/)
 
-## 8. Reproduce cell clustering results using the PATTY package
+## 8. Reproduce results using the PATTY package
 Users can reproduce the bulk correction data in the manuscript (Figure 4A, H3K27me3 CUT&Tag data in K562) by running PATTY with the following command line:
 ```sh
 $ PATTY -m bulk -c ${path}/testdata_bulk_H3K27me3_reads.bed.gz -a ${path}/testdata_bulk_ATAC_reads.bed.gz -f H3K27me3 -o testdata_bulk_H3K27me3 
