@@ -17,6 +17,7 @@ v1.0.0 PATTY for biorxiv manuscript and initial submission
 
 ## 1. Installation
 - Package requirements<br>
+PATTY requires Linux or MacOS as OS.<br>
 PATTY requires [Python](https://www.python.org) 3.6+ and [Rscript](https://www.r-project.org) v3+ to run.<br>
 PATTY requires Python packages [scipy](https://scipy.org) and [numpy](https://numpy.org) pre-installed.
 
