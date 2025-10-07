@@ -21,7 +21,11 @@ v1.1 Improve the installation steps. Designed for paper revision.
 - Package requirements<br>
 PATTY requires Linux or MacOS as OS.<br>
 PATTY requires [Python](https://www.python.org) 3.6+ and [Rscript](https://www.r-project.org) v3+ to run.<br>
-PATTY requires Python packages [scipy](https://scipy.org) and [numpy](https://numpy.org) pre-installed.
+PATTY requires Python packages [scipy](https://scipy.org), [numpy](https://numpy.org), [pandas](https://pandas.pydata.org/), and [joblib](https://joblib.readthedocs.io/) pre-installed.
+PATTY sc mode requires Rpackage [ArchR](https://www.archrproject.com/) pre-installed.
+
+- Genome-wide mappable region annotation<br>
+The genome-wide annotation file for [hg38](https://www.dropbox.com/scl/fi/k6iwvr0rh7ozycxv8u8fh/hg38_mappableBin.bed.gz?rlkey=5ofxbeankzvjlb608p2o7y3bn) and [mm10](https://www.dropbox.com/scl/fi/1fa3ji3pmurreb05lopos/mm10_mappableBin.bed.gz?rlkey=250svcejszkf80zmjel8yaz5m) genome can be downloaded here and input when running PATTY.
 
 \# for root user
 ```sh
@@ -116,10 +120,6 @@ chr2    20840   21000   CellB
    - Columns: individual cells
    - Values: Similar PATTY score like in Bulk mode but for each individual cell  
 
-2. `NAME_scClustering.txt.gz`  
-   The cell clustering result is based on the PATTY bias-corrected matrix.  
-   - Format: tab-delimited, with each cell's cluster label
-
 
 ## 6. Testing data and example of output files
 We provided the test data for users to test PATTY. The sc/bulk output can also be generated with the command lines in Section 2 using the testing data as input. Click the file names to download. 
@@ -129,8 +129,6 @@ We provided the test data for users to test PATTY. The sc/bulk output can also b
 - testing data for **sc** mode:
    - H3K27me3 [`Dropbox`](https://www.dropbox.com/scl/fi/t9hv9okgubvmevbafysh5/testdata_sc_H3K27me3_reads.bed.gz)
    - ATAC [`Dropbox`](https://www.dropbox.com/scl/fi/tlb9tzn32ykwzlh19znch/testdata_sc_ATAC_reads.bed.gz)
-- output for PATTY **bulk** mode using bulk-testing data input: [`Dropbox`](https://www.dropbox.com/scl/fi/597k0encidxcxr02m5db7/testdata_bulk_H3K27me3_PATTYcorrect.bw)
-- output for PATTY **sc** mode using sc-testing data input: [`Dropbox`](https://www.dropbox.com/scl/fi/8t5cjaani27tgs82lfpcr/testdata_sc_H3K27me3_clustering.txt.gz) 
 
 
 ## 7. Other parameters in the PATTY pipeline
@@ -154,15 +152,11 @@ You can also set the following parameters for more accurate bias estimation and 
 - -\-keeptmp  
 [optional] Whether or not to keep the intermediate results (tmpResults/)
 
-## 8. Reproduce results using the PATTY package
-Users can reproduce the bulk correction data in the manuscript (Figure 4A, H3K27me3 CUT&Tag data in K562) by running PATTY with the following command line:
+## 8. Reproduce figure results from the PATTY manuscript
+Users can reproduce the bias correction results from the manuscript (Figure 4A, G, H, H3K27me3 CUT&Tag rep1) by running PATTY with the following command line:
 ```sh
-$ PATTY -m bulk -c ${path}/testdata_bulk_H3K27me3_reads.bed.gz -a ${path}/testdata_bulk_ATAC_reads.bed.gz -f H3K27me3 -o testdata_bulk_H3K27me3 
+$ PATTY -m bulk -c ${path}/H3K27me3_CUTTag_rep1.bed.gz -a ${path}/ATAC.bed.gz -f H3K27me3 -o bulkH3K27me3  
 ```
-Users can reproduce the clustering results for the sc correction data in the manuscript (Figure 7B, H3K27me3 nano-CT data in mouse brain,  K-means clustering) by running PATTY with the following command line:
-```sh
-$ PATTY -m sc -c ${path}/testdata_sc_H3K27me3_reads.bed.gz -a ${path}/testdata_sc_ATAC_reads.bed.gz -f H3K27me3 -o testdata_sc_H3K27me3 --UMAP --overwrite --keeptmp 
-```
-The example input data in the command line and output results can be downloaded via the link in section 6.
+Download input [CUT&Tag](https://www.dropbox.com/scl/fi/nyonvtpe8pdhm607vd151/H3K27me3_CUTTag_rep1.bed.gz?rlkey=liligwf0mt3mnyj678zcaloub) and [ATAC](https://www.dropbox.com/scl/fi/gxqxljiv6mr68l92e4hsm/ATAC.bed.gz?rlkey=n05eoajmo54a9lovz0bjba3rj) data, and example [output](https://www.dropbox.com/scl/fi/fdm9vhony2mp0mblqnxnf/bulkH3K27me3_correctSig.bw?rlkey=2xps6q0p5pmdt6e8pgxyojhyu) here.
 
 
