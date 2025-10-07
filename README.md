@@ -14,7 +14,7 @@ Our manuscript is now available on [Biorxiv](https://www.biorxiv.org/content/10.
 
 
 - Changelog<br>
-v1.0 PATTY for biorxiv manuscript and initial submission 
+v1.0 PATTY for biorxiv manuscript and initial submission<br> 
 v1.1 Improve the installation steps. Designed for paper revision.
 
 ## 1. Installation
