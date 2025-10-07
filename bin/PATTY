@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# Time-stamp: <2025-06-01 12:08:55 Shengen Hu>
+# Time-stamp: <2025-08-01 12:08:55 Shengen Hu>
  
-"""Description: software package for "SELMA: a computational framework for modeling intrinsic biases in chromatin accessibility sequencing data"
+"""Description: software package for "PATTY: corrects open chromatin bias for improved bulk and single-cell CUT&Tag profiling"
 Copyright (c) 2025 Shengen Hu <tarelahu@gmail.com>
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included with
@@ -40,12 +40,8 @@ from PATTYpipe.Utility import (sp,
 # -------------------
 
 from PATTYpipe.step0_check_data import step0_check_data
-from PATTYpipe.step1_QC_format import step1_QC_format
-from PATTYpipe.step2_BULKscanSig import step2_BULKscanSig
-from PATTYpipe.step3_BULKcorrect import step3_BULKcorrect
-from PATTYpipe.step2_SCscanSig import step2_SCscanSig
-from PATTYpipe.step3_SCcorrect import step3_SCcorrect
-from PATTYpipe.step4_SCcellClustering import step4_SCcellClustering
+from PATTYpipe.step1_BULKscanSig import step1_BULKscanSig
+from PATTYpipe.step1_SCscanSig import step1_SCscanSig
 from PATTYpipe.stepFinal_summary import stepFinal_summary
 
 # ------------------------------------
@@ -67,34 +63,24 @@ def main():
                              help = "[required] Mode of PATTY, choose from bulk or sc(single-cell)")
     optparser.add_option("-c","--cuttag", dest = 'cuttag',type="str",
                              help = "[required] CUTTAG Input fragments file in (paired/single end) bed format for CUT&Tag data, with .bed extension (or .bed.gz for comparessed file). For sc mode, the 4th(name) column of the bed file represents the name/barcode of the corresponding individual cell" )
-    optparser.add_option("-a","--atac", dest = 'atac',type="str",
+    optparser.add_option("-a","--atac", dest = 'atac',type="str", 
                              help = "[required] ATAC Input fragments file in bed format for ATAC-seq data, with .bed extension(or .bed.gz for comparessed file). The ATAC-seq fragments were used as bulk data for both sc and bulk modes (only chrm,start,end 3columns are required)" )
     optparser.add_option("-f","--factor",dest='factor',type="choice",choices=("H3K27me3","H3K27ac","H3K9me3"),
-                             help = "[required] FACTOR Factor type of the CUT&Tag data. Currently PATTY support H3K27me3 (default), H3K27ac, and H3K9me3" )
-    optparser.add_option("-g","--genome",dest='genome',type="str",default="hg38",
-                             help = "[required] genome version of the input data, choose from hg38 (default) and mm10" )
+                             help = "[required] FACTOR Factor type of the CUT&Tag data. Currently PATTY support H3K27me3, H3K27ac, and H3K9me3" )
+    optparser.add_option("-g","--genome",dest="genome",type="choice",choices=("hg38","mm10"),
+                             help = "[required] genome version, currently support hg38 and mm10.")
+    optparser.add_option("-b","--genomebin",dest='genomebin',type="str",
+                             help = "[required] genome-wide mappable bin file. The bin file annotation for supported genome (hg38/mm10) is pre-defined and provided." )
     optparser.add_option("-o","--outname", dest="outname",type="str",
                              help = "[required] Name of output results" )
 
 #========minor options============= 
-    optparser.add_option("--binMinReads",dest="binminreads",type="str",default="5",
-                         help="[optional] Bins with < 5(default) reads covered will be discarded in the analysis. For sc mode, bins with a total of < 5 (default) reads across all high-quality cells will be discarded. set 0 to turn off this parameter")
     optparser.add_option("--binList",dest="binlist",type="str",
-                         help="[optional] Bed file for inputting candidate bins/peaks for the analysis. When inputted, the correction will be done in only these bins for bulk mode. The correction/clustering will be only done these bins for sc mode. This parameter is designed for customized high-reads bin (bulk mode) or high-var bin (sc mode). The inputed peaks/bins will be transformed/splited to 200bp bins for as the input")
-#    optparser.add_option("--peakCutoff",dest="peakcutoff",type="float",default=0,
-#                         help="[optional] set a cutoff to perform peak calling")
+                         help="[optional] Bed file for inputting candidate bins/peaks for the analysis. When inputted, the correction will be done on only these bins, otherwise the correction will be done on genome mappable bins (specified by -b). This parameter is designed for customized high-reads bin (bulk mode) or high-var bin (sc mode). The inputed peaks/bins will be transformed/splited to 200bp bins for as the input. The genome version of the binlist bed file should be hg38 or mm10.")
     optparser.add_option("--cellnames",dest="cellnames",type="str",
                          help="[sc optional] Single column file for name list of used individual cells, each line contain the name of the individual cell. This parameter is only used for sc mode")
-    optparser.add_option("--readCutoff",dest="readcutoff",type="int",default=10000,
-                         help="[sc optional] Reads number cutoff for high quality cells. Cells with < 10000(default) reads will be discarded in the analysis. Set 0 to turn off this parameter")
-    optparser.add_option("--clusterMethod",dest="clustermethod",type="choice",default="Kmeans",choices=("Kmeans","Seurat","APEC","scran"),
-                         help="[sc optional] Method used for single cell clustering analysis. Default is Kmeans(PCA dim reduction + K-means clustering. Optional choices (Seurat,scran,APEC) require related packages installed")
-    optparser.add_option("--clusterNum",dest="clusterNum",type="int",default=10,
-                         help="[sc optional] number of clusters specified for clustering(default=10). Only used for PCAkm[clusterMethod] method")
-    optparser.add_option("--topDim",dest="topDim",type="int",default=60,
-                         help="[sc optional] number of dimensions (with highest Variance) used for clustering. Only used for PCAkm(PC) and Seurat/scran (Latent variable). This number is suggested to be >=30 (deafult=60)")
-    optparser.add_option("--UMAP",dest="UMAP",default=False, action='store_true', 
-                         help="[sc optional] Turn on this parameter to generate a UMAP plot (tSNE for APEC and Cicero) for the clustering results")
+    optparser.add_option("--readCutoff",dest="readcutoff",type="int",default=100,
+                         help="[sc optional] Reads number cutoff for high quality cells. Cells with < 100(default) reads will be discarded in the analysis. This parameter is only used for sc mode")
     optparser.add_option("--overwrite",dest='fover',  default=False, action='store_true', 
                          help = "[optional] Force overwrite, this cmd will remove existing result if set !! " )
     optparser.add_option("--keeptmp",dest='keeptmp',  default=False, action='store_true', 
@@ -104,58 +90,63 @@ def main():
 
     if not options.mode:
         optparser.print_help()
-        print('SELMA mode (-m) is required ')
+        print('PATTY mode (-m) is required ')
         sys.exit(1)
 
-    if not options.fragments:
+    if not options.cuttag:
         optparser.print_help()
-        print('Input fragments file (-i) is required ')
+        print('Input cuttag file (-c) is required ')
+        sys.exit(1)
+
+    if not options.atac:
+        optparser.print_help()
+        print('Output atac name (-a) is required ')
+        sys.exit(1)
+
+    if not options.factor:
+        optparser.print_help()
+        print('factor type (-f) is required ')
+        sys.exit(1)
+
+    if not options.genome:
+        optparser.print_help()
+        print('genome version (-g) is required ')
+        sys.exit(1)
+
+    if not options.genomebin:
+        optparser.print_help()
+        print('genome bin file (-b) is required ')
         sys.exit(1)
 
     if not options.outname:
         optparser.print_help()
-        print('Output file name (-o) is required ')
-        sys.exit(1)
-
-    if not options.datatype:
-        optparser.print_help()
-        print('Datatype (-t) is required ')
-        sys.exit(1)
-
-    if not options.sequence:
-        optparser.print_help()
-        print('genome sequence file (-s) is required ')
+        print('outname (-o) is required ')
         sys.exit(1)
 
     conf_dict = {}
     conf_dict['General'] = {}
     conf_dict['options'] = {}
-
+    ## major param
     conf_dict['General']['mode'] = options.mode
-    conf_dict['General']['fragments'] = options.fragments
-    conf_dict['General']['format'] = options.format
+    conf_dict['General']['cuttag'] = options.cuttag
+    conf_dict['General']['atac'] = options.atac
+    conf_dict['General']['factor'] = options.factor
     conf_dict['General']['genome'] = options.genome
-    conf_dict['General']['sequence'] = options.sequence
-    conf_dict['General']['datatype'] = options.datatype
+    conf_dict['General']['genomebin'] = options.genomebin
     conf_dict['General']['outname'] = options.outname
-    conf_dict['options']['peak'] = options.peak
-    conf_dict['options']['extend'] = options.extend
-    conf_dict['options']['peakqval'] = options.peakqval
-    conf_dict['options']['bias'] = options.bias
-    conf_dict['options']['kmer'] = options.kmer
-    conf_dict['options']['scATAC10x'] = options.scATAC10x
+
+    ## minor option
+    conf_dict['options']['keeptmp'] = options.keeptmp
+    # bulk option
+    conf_dict['options']['binlist'] = options.binlist
+    # sc option
     conf_dict['options']['cellnames'] = options.cellnames
     conf_dict['options']['readcutoff'] = options.readcutoff
-    conf_dict['options']['SCcorrection'] = options.SCcorrection
-    conf_dict['options']['SCmodel'] = "beta1"#options.SCmodel
-    conf_dict['options']['peakminreads'] = options.peakminreads
-    conf_dict['options']['peakmaxreads'] = options.peakmaxreads
-    conf_dict['options']['lowbiaspeak'] = options.lowbiaspeak
-    conf_dict['options']['clustermethod'] = options.clustermethod
-    conf_dict['options']['clusterNum'] = options.clusterNum    
-    conf_dict['options']['topDim'] = options.topDim    
-    conf_dict['options']['UMAP'] = options.UMAP 
-    conf_dict['options']['keeptmp'] = options.keeptmp
+    #conf_dict['options']['clustermethod'] = options.clustermethod
+    #conf_dict['options']['clusterNum'] = options.clusterNum    
+    #conf_dict['options']['topDim'] = options.topDim    
+    #conf_dict['options']['UMAP'] = options.UMAP 
+
     ### read raw path of output dir, the startdir will be used when the input file is not in absolute path
     conf_dict['General']['startdir'] = os.getcwd()+'/'
 
@@ -199,64 +190,52 @@ def main():
     conf_dict['QC'] = {}
     conf_dict['results'] = {}
 
-    wlog("Start SELMA %s"%(conf_dict['General']['mode']),logfile)
-    wlog("Step0: check input Data and parameters",logfile)   
+    wlog("Start PATTY %s mode"%(conf_dict['General']['mode']),logfile)
+    wlog("check input Data and parameters",logfile)   
     step0_check_data(conf_dict,logfile)
-    wlog('Step0 check input Data and parameters DONE',logfile)
+    #wlog('check input Data and parameters DONE',logfile)
 
-    # QC, reformat
-    t = time.time()
-    wlog("Step1: check quality and reformat data",logfile)
-    step1_QC_format(conf_dict,logfile)
-    step1time = time.time() -t
-    wlog("Step1: check quality and reformat data DONE",logfile)
-    wlog("running time for Step1 : %s"%(step1time),logfile)
-
-    # bias matrix
-    t = time.time()
-    wlog("Step2: bias estimation",logfile)
-    step2_biasMat(conf_dict,logfile)
-    step2time = time.time()-t
-    wlog("Step2: bias estimation",logfile)
-    wlog("running time for Step2: bias estimation: %s"%(step2time),logfile)
-
-    # peak calling
-    t = time.time()
-    wlog('Step3: peak detection',logfile)
-    step3_callpeak(conf_dict,logfile)
-    step3time = time.time() -t
-    wlog("running time for Step3: peak detection %s"%(step3time),logfile)
- 
     if conf_dict['General']['mode'] == "bulk":
-       # cleavage bias
-       t = time.time()
-       wlog('Step4: generate cleavage and bias profile on peaks',logfile)
-       step4_BULKcleavageBias(conf_dict,logfile)
-       step4time = time.time() -t
-       wlog("running time for Step4: generate cleavage and bias profile on peaks %s"%(step4time),logfile)
-    else:
-       # sc peak bias
-       t = time.time()
-       wlog('Step4: peak level bias estimation for single-cell',logfile)
-       step4_SCpeakbias(conf_dict,logfile)
-       step4time = time.time() -t
-       wlog("running time for Step4: peak level bias estimation for single-cell %s"%(step4time),logfile)
+        # bulk bias
+        t = time.time()
+        wlog('bulk correction',logfile)
+        step1_BULKscanSig(conf_dict,logfile)
+        step1time = time.time() -t
+        wlog("running time for: bulk correction, %s"%(step1time),logfile)
 
-       # sc clustering
-       t = time.time()
-       wlog('Step5: single-cell clustering',logfile)
-       step5_SCcellClustering(conf_dict,logfile)
-       step5time = time.time() -t
-       wlog("running time for Step5: single-cell clustering %s"%(step5time),logfile)
+    else:
+        # sc bias
+        t = time.time()
+        wlog('single-cell scan signal',logfile)
+        step1_SCscanSig(conf_dict,logfile)
+        step1time = time.time() -t
+        wlog("running time for: single-cell correction, %s"%(step1time),logfile)
+
+        #t = time.time()
+        #wlog('Step2: single-cell bias correction',logfile)
+        #step2_SCcorrect(conf_dict,logfile)
+        #step2time = time.time() -t
+        #wlog("running time for Step2: single-cell bias correction, %s"%(step2time),logfile)
+
+        ## sc clustering
+        #t = time.time()
+        #wlog('Step3: single-cell clustering',logfile)
+        #step3_SCcellClustering(conf_dict,logfile)
+        #step3time = time.time() -t
+        #wlog("running time for Step3: single-cell clustering %s"%(step3time),logfile)
 
     # summary
-    t = time.time()
-    wlog('StepFinal: summary',logfile)
+    #t = time.time()
+    #wlog('StepFinal: summary',logfile)
     stepFinal_summary(conf_dict,logfile)
-    stepFtime = time.time() -t
-    wlog("running time for StepFinal: summary %s"%(stepFtime),logfile)
+    #stepFtime = time.time() -t
+    #wlog("running time for StepFinal: summary %s"%(stepFtime),logfile)
 
-    wlog("SELMA finished. Check the folder: %s/summary/ for results"%(conf_dict['General']['outname']),logfile)
+    if conf_dict['General']['mode'] == "bulk" and os.path.isfile("%s_correctSig.bw"%(conf_dict['General']['outname'])):
+        wlog('bulk mode Done, check %s_correctSig.bw as bias-corrected signal'%(conf_dict['General']['outname']),logfile)
+    if conf_dict['General']['mode'] == "sc" and os.path.isfile("%s_correctMat.txt"%(conf_dict['General']['outname'])):
+        wlog('sc mode Done, check %s_correctMat.txt as bias-corrected matrix'%(conf_dict['General']['outname']),logfile)
+#    wlog("PATTY finished. Check the folder: %s/summary/ for results"%(conf_dict['General']['outname']),logfile)
 
 if __name__== '__main__':
     try:
@@ -265,4 +244,3 @@ if __name__== '__main__':
     except KeyboardInterrupt:
         sys.stderr.write("User interrupt me >.< \n")
         sys.exit(0)
-
