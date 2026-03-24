@@ -160,4 +160,4 @@ $ PATTY -m bulk -c ${path}/H3K27me3_CUTTag_rep1.bed.gz -a ${path}/ATAC.bed.gz -f
 ```
 Download input [CUT&Tag](https://www.dropbox.com/scl/fi/nyonvtpe8pdhm607vd151/H3K27me3_CUTTag_rep1.bed.gz?rlkey=liligwf0mt3mnyj678zcaloub) and [ATAC](https://www.dropbox.com/scl/fi/gxqxljiv6mr68l92e4hsm/ATAC.bed.gz?rlkey=n05eoajmo54a9lovz0bjba3rj) data, and example [output](https://www.dropbox.com/scl/fi/fdm9vhony2mp0mblqnxnf/bulkH3K27me3_correctSig.bw?rlkey=2xps6q0p5pmdt6e8pgxyojhyu) here.
 
-
+Users can reproduce other results and figures with the scripts in this Reproduction Instructions [folder](https://www.dropbox.com/scl/fo/t5wtvd9wi72ao66icawud/ACtm8p7tN7rdF9LxlxgfTmQ?rlkey=dg2yulh1nmnvw4u9abxzw93rv).
