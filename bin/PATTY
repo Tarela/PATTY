@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-# Time-stamp: <2025-08-01 12:08:55 Shengen Hu>
+# Time-stamp: <2026-05-01 12:08:55 Shengen Hu>
  
 """Description: software package for "PATTY: corrects open chromatin bias for improved bulk and single-cell CUT&Tag profiling"
-Copyright (c) 2025 Shengen Hu <tarelahu@gmail.com>
+Copyright (c) 2026 Shengen Hu <tarelahu@gmail.com>
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included with
 the distribution).
@@ -75,8 +75,8 @@ def main():
                              help = "[required] Name of output results" )
 
 #========minor options============= 
-    optparser.add_option("--binList",dest="binlist",type="str",
-                         help="[optional] Bed file for inputting candidate bins/peaks for the analysis. When inputted, the correction will be done on only these bins, otherwise the correction will be done on genome mappable bins (specified by -b). This parameter is designed for customized high-reads bin (bulk mode) or high-var bin (sc mode). The inputed peaks/bins will be transformed/splited to 200bp bins for as the input. The genome version of the binlist bed file should be hg38 or mm10.")
+    #optparser.add_option("--binList",dest="binlist",type="str",
+    #                     help="[optional] Bed file for inputting candidate bins/peaks for the analysis. When inputted, the correction will be done on only these bins, otherwise the correction will be done on genome mappable bins (specified by -b). This parameter is designed for customized high-reads bin (bulk mode) or high-var bin (sc mode). The inputed peaks/bins will be transformed/splited to 200bp bins for as the input. The genome version of the binlist bed file should be hg38 or mm10.")
     optparser.add_option("--cellnames",dest="cellnames",type="str",
                          help="[sc optional] Single column file for name list of used individual cells, each line contain the name of the individual cell. This parameter is only used for sc mode")
     optparser.add_option("--readCutoff",dest="readcutoff",type="int",default=100,
@@ -138,7 +138,7 @@ def main():
     ## minor option
     conf_dict['options']['keeptmp'] = options.keeptmp
     # bulk option
-    conf_dict['options']['binlist'] = options.binlist
+    #conf_dict['options']['binlist'] = options.binlist
     # sc option
     conf_dict['options']['cellnames'] = options.cellnames
     conf_dict['options']['readcutoff'] = options.readcutoff

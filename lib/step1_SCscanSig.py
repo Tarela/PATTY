@@ -31,19 +31,21 @@ from PATTYpipe.Utility      import (sp,
 def step1_SCscanSig(conf_dict,logfile):
 
     wlog('preprocess scCnT data with ArchR package',logfile)
-    scProcess(CnTdata,GENOME,readsCutoff)
+#    scProcess(CnTdata,GENOME,readsCutoff)
     conf_dict['General']['scPackage'] = scProcess(conf_dict['General']['cuttag'],
                                                   conf_dict['General']['genome'],
                                                   conf_dict['options']['readcutoff'])
-
-    if conf_dict['General']['scPackage']  == "noPackage":
-        wlog("related package (ArchR) were not installed. PATTY cannot process scCnT data.",logfile)
-
-    if conf_dict['options']['binlist'] == "NA":
-        rawbinFile = "tmp_scProcess/tmp_highVarBin.bed"
+    if os.path.isfile("tmp_scProcess/tmp_cellDist.txt") and os.path.isfile("tmp_scProcess/tmp_highVarBin.bed"):
+        pass
     else:
-        rawbinFile = conf_dict['options']['binlist']
-    cmd = """%s intersect -a %s -b %s -u > tmp_usebins.bed"""%(conf_dict['General']['bedtools'],conf_dict['General']['genomebin'],rawbinFile)
+#    if conf_dict['General']['scPackage']  == "noPackage" and :
+        ewlog("ArchR process was not done. PATTY cannot process scCnT data.",logfile)
+
+    #if conf_dict['options']['binlist'] == "NA":
+    rawbinFile = "tmp_scProcess/tmp_highVarBin.bed"
+    #else:
+    #    rawbinFile = conf_dict['options']['binlist']
+    cmd = """%s intersect -a <(zcat %s) -b %s -u > tmp_usebins.bed"""%(conf_dict['General']['bedtools'],conf_dict['General']['genomebin'],rawbinFile)
     tmplog = sp(cmd)
     binFile = "tmp_usebins.bed"
 

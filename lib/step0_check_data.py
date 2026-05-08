@@ -89,32 +89,32 @@ def step0_check_data(conf_dict,logfile):
         conf_dict['General']['genomebin'] = conf_dict['General']['startdir'] + conf_dict['General']['genomebin']
     if not os.path.isfile(conf_dict['General']['genomebin']):
         ewlog("genome-wide mappable bin file %s not found"%(conf_dict['General']['genomebin']),logfile)
-    if not conf_dict['General']['atac'].endswith('.bed') and not conf_dict['General']['genomebin'].endswith('.bed.gz'):
-        ewlog('extenion of genome-wide mappable bin file is not .bed (nor .bed.gz)',logfile)
+    if not conf_dict['General']['genomebin'].endswith('.bed') and not conf_dict['General']['genomebin'].endswith('.bed.gz'):
+        ewlog('extenion of genome-wide mappable bin file is not .bed or not .bed.gz',logfile)
 
     # --binlist
-    if conf_dict['options']['binlist']:
-        if "/" in conf_dict['options']['binlist']:
-            if conf_dict['options']['binlist'].startswith("/"):
-                pass
-            elif conf_dict['options']['binlist'].startswith("~/"):
-                homedir = os.path.expanduser("~")
-                conf_dict['options']['binlist'] = homedir +"/" + conf_dict['options']['binlist'][1:]
-            else:
-                conf_dict['options']['binlist'] = conf_dict['General']['startdir'] + conf_dict['options']['binlist']
-        else:
-            conf_dict['options']['binlist'] = conf_dict['General']['startdir'] + conf_dict['options']['binlist']
-
-        if not os.path.isfile(conf_dict['options']['binlist']):
-            wlog("external binlist file %s not found, PATTY use genome-wide mappable bins with sufficient reads"%(conf_dict['options']['binlist']),logfile)
-            conf_dict['options']['binlist'] = "NA"
-        checkbed = checkbedformat(conf_dict['options']['binlist'])
-        if checkbed == "fail":
-            wlog("external binlist file %s is not a bed file, PATTY use genome-wide mappable bins with sufficient reads"%(conf_dict['options']['binlist']),logfile)
-            conf_dict['options']['binlist'] = "NA"
-    else:
-        wlog("no external binlist file inputted, PATTY use genome-wide mappable bins file as target regions",logfile)
-        conf_dict['options']['binlist'] = "NA"
+    #if conf_dict['options']['binlist']:
+    #    if "/" in conf_dict['options']['binlist']:
+    #        if conf_dict['options']['binlist'].startswith("/"):
+    #            pass
+    #        elif conf_dict['options']['binlist'].startswith("~/"):
+    #            homedir = os.path.expanduser("~")
+    #            conf_dict['options']['binlist'] = homedir +"/" + conf_dict['options']['binlist'][1:]
+    #        else:
+    #            conf_dict['options']['binlist'] = conf_dict['General']['startdir'] + conf_dict['options']['binlist']
+    #    else:
+    #        conf_dict['options']['binlist'] = conf_dict['General']['startdir'] + conf_dict['options']['binlist']
+#
+    #    if not os.path.isfile(conf_dict['options']['binlist']):
+    #        wlog("external binlist file %s not found, PATTY use genome-wide mappable bins with sufficient reads"%(conf_dict['options']['binlist']),logfile)
+    #        conf_dict['options']['binlist'] = "NA"
+    #    checkbed = checkbedformat(conf_dict['options']['binlist'])
+    #    if checkbed == "fail":
+    #        wlog("external binlist file %s is not a bed file, PATTY use genome-wide mappable bins with sufficient reads"%(conf_dict['options']['binlist']),logfile)
+    #        conf_dict['options']['binlist'] = "NA"
+    #else:
+    #    wlog("no external binlist file inputted, PATTY use genome-wide mappable bins file as target regions",logfile)
+    #    conf_dict['options']['binlist'] = "NA"
         
     # check software
     OS = platform.system()

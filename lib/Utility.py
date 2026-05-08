@@ -162,7 +162,7 @@ def read_in_reads(readFile,binSig):
             ll = line.split()
             reads_chrm = ll[0]
             reads_cover1=[]
-            reads_cover2=[]
+            #reads_cover2=[]
             if len(ll) >= 6 and ll[5] in ["+","-"]:
                 if ll[5] == "+":
                     plus = int(ll[1])
@@ -209,7 +209,7 @@ def read_in_reads_sc(readFile,binSig, total_reads_count):
                 continue
             total_reads_count[reads_cell]  += 1
             reads_cover1=[]
-            reads_cover2=[]
+            #reads_cover2=[]
             plus = int(ll[1])
             minus = int(ll[2])# - 1
             if random.randint(0,1) == 0:
@@ -306,7 +306,6 @@ if(require("ArchR")){
                            as.numeric(proj_CnTpro_3@reducedDims$IterativeLSI$LSIFeatures$start),
                            as.numeric(proj_CnTpro_3@reducedDims$IterativeLSI$LSIFeatures$start) + 500)
   write.table(highVarBin_tmp, file="tmp_highVarBin.bed",row.names=F,col.names=F,sep="\t",quote=F)            
-  }
 }else{
   simpleError("NoInstall")
 }

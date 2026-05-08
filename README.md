@@ -22,19 +22,20 @@ v1.1 Improve the installation steps. Designed for paper revision.
 PATTY requires Linux or MacOS as OS.<br>
 PATTY requires [Python](https://www.python.org) 3.6+ and [Rscript](https://www.r-project.org) v3+ to run.<br>
 PATTY requires Python packages [scipy](https://scipy.org), [numpy](https://numpy.org), [pandas](https://pandas.pydata.org/), and [joblib](https://joblib.readthedocs.io/) pre-installed.
+PATTY requires Bedtools (Quinlan et al., Bioinformatics, 2010) and UCSC tools (Kuhn et al., Brief Bioinform. 2013) pre-installed.
 PATTY sc mode requires Rpackage [ArchR](https://www.archrproject.com/) pre-installed.
 
 - Genome-wide mappable region annotation<br>
-The genome-wide annotation file for [hg38](https://www.dropbox.com/scl/fi/k6iwvr0rh7ozycxv8u8fh/hg38_mappableBin.bed.gz?rlkey=5ofxbeankzvjlb608p2o7y3bn) and [mm10](https://www.dropbox.com/scl/fi/1fa3ji3pmurreb05lopos/mm10_mappableBin.bed.gz?rlkey=250svcejszkf80zmjel8yaz5m) genome can be downloaded here and input when running PATTY.
+The genome-wide annotation file for [hg38](https://www.dropbox.com/scl/fi/k6iwvr0rh7ozycxv8u8fh/hg38_mappableBin.bed.gz) and [mm10](https://www.dropbox.com/scl/fi/1fa3ji3pmurreb05lopos/mm10_mappableBin.bed.gz) genome can be downloaded here and input when running PATTY.
 
 \# for root user
 ```sh
 $ cd PATTY
-$ sudo python setup.py install  
+$ pip install .  
 ```
 \# if you are not the root user, you can install PATTY at a specific location where you have write permission
 ```sh
-$ python setup.py install --prefix /home/PATTY  # Here you can replace “/home/PATTY” with any location 
+$ pip install . --prefix /home/PATTY  # Here you can replace “/home/PATTY” with any location 
 $ export PATH=/home/PATTY/bin:$PATH    # setup PATH for the software
 $ export PYTHONPATH=/home/PATTY/lib/python3.6/site-packages:$PYTHONPATH    # setup PYTHONPATH for module import
 ```
@@ -45,7 +46,6 @@ $ PATTY --help  # If you see the help manual, you have successfully installed PA
 
 \# NOTE: 
 - To install PATTY on MacOS, the users need to download and install Command Line Tools beforehand
-- Bedtools (Quinlan et al., Bioinformatics, 2010) and UCSC tools (Kuhn et al., Brief Bioinform. 2013) will be installed automatically if not installed. 
 
 ## 2. Run PATTY (usage)
 #### Essential parameters
@@ -65,14 +65,14 @@ Name of output results
 
 Example of running PATTY with default parameters (test data downloadable in :
 
-\# bulk mode 
+\# bulk mode (mappable bin file can be downloaded in section1)
 ```sh
-$ PATTY -m bulk -c ${path}/testdata_bulk_H3K27me3_reads.bed.gz -a ${path}/testdata_bulk_ATAC_reads.bed.gz -f H3K27me3 -o testbulk 
+$ PATTY -m bulk -c ${path}/testbulk_H3K27me3.bed.gz -a ${path}/testbulk_ATAC.bed.gz -f H3K27me3 -o testbulk -g hg38 -b hg38_mappableBin.bed.gz 
 ```
 
-\# sc mode 
+\# sc mode (note that sc mode require bgzip compressed bed reads file for scCUT&Tag reads) 
 ```sh
-$ PATTY -m sc -c ${path}/testdata_sc_H3K27me3_reads.bed.gz -a ${path}/testdata_sc_ATAC_reads.bed.gz -f H3K27me3 -o testsc  
+$ PATTY -m sc -c ${path}/testsc_H3K27me3.bed.gz -a ${path}/testsc_ATAC.bed.gz -f H3K27me3 -o testsc -g hg38 -b hg38_mappableBin.bed.gz 
 ```
 
 
@@ -124,19 +124,17 @@ chr2    20840   21000   CellB
 ## 6. Testing data and example of output files
 We provided the test data for users to test PATTY. The sc/bulk output can also be generated with the command lines in Section 2 using the testing data as input. Click the file names to download. 
 - testing data for **bulk** mode:
-   - H3K27me3 [`Dropbox`](https://www.dropbox.com/scl/fi/820c3ryhj7ffbbkysgd5k/testdata_bulk_H3K27me3_reads.bed.gz)
-   - ATAC [`Dropbox`](https://www.dropbox.com/scl/fi/n90qbq6xf1hir31legnlc/testdata_bulk_ATAC_reads.bed.gz)
+   - H3K27me3 [`Dropbox`](https://www.dropbox.com/scl/fi/7g46rtmeg9eihj0jbil08/testbulk_H3K27me3.bed.gz)
+   - ATAC [`Dropbox`](https://www.dropbox.com/scl/fi/0ls8fb7qw5v91vmjeff9h/testbulk_ATAC.bed.gz)
 - testing data for **sc** mode:
-   - H3K27me3 [`Dropbox`](https://www.dropbox.com/scl/fi/t9hv9okgubvmevbafysh5/testdata_sc_H3K27me3_reads.bed.gz)
-   - ATAC [`Dropbox`](https://www.dropbox.com/scl/fi/tlb9tzn32ykwzlh19znch/testdata_sc_ATAC_reads.bed.gz)
+   - H3K27me3 [`Dropbox`](https://www.dropbox.com/scl/fi/2pid9491b99jgzp784mzo/testsc_H3K27me3.bed.gz)
+   - ATAC [`Dropbox`](https://www.dropbox.com/scl/fi/osv616pafwoycjk5cfkx8/testsc_ATAC.bed.gz)
 
 
 ## 7. Other parameters in the PATTY pipeline
 You can also set the following parameters for more accurate bias estimation and correction:
 - -\-binMinReads=BINMINREADS  
 [optional] Bins with < 5(default) reads covered will be discarded in the analysis. For sc mode, bins with a total of < 5 (default) reads across all high-quality cells will be discarded. set 0 to turn off this parameter. 
-- -\-binList=BINLIST  
-[optional] Bed file for inputting candidate bins/peaks for the analysis. When inputted, the correction will be done in only these bins for bulk mode. The correction/clustering will be only done these bins for sc mode. This parameter is designed for customized high-reads bin (bulk mode) or high-var bin (sc mode). The inputed peaks/bins will be transformed/splited to 200bp bins for as the input. 
 - -\-cellnames=CELLNAMES  
 [optional] Single column plain text file for name list of used individual cells, each line contain the name of the individual cell. This parameter is only used for sc mode. 
 - -\-readCutoff=READCUTOFF  
@@ -157,6 +155,10 @@ Users can reproduce the bias correction results from the manuscript (Figure 4A, 
 ```sh
 $ PATTY -m bulk -c ${path}/H3K27me3_CUTTag_rep1.bed.gz -a ${path}/ATAC.bed.gz -f H3K27me3 -o bulkH3K27me3  
 ```
-Download input [CUT&Tag](https://www.dropbox.com/scl/fi/nyonvtpe8pdhm607vd151/H3K27me3_CUTTag_rep1.bed.gz?rlkey=liligwf0mt3mnyj678zcaloub) and [ATAC](https://www.dropbox.com/scl/fi/gxqxljiv6mr68l92e4hsm/ATAC.bed.gz?rlkey=n05eoajmo54a9lovz0bjba3rj) data, and example [output](https://www.dropbox.com/scl/fi/fdm9vhony2mp0mblqnxnf/bulkH3K27me3_correctSig.bw?rlkey=2xps6q0p5pmdt6e8pgxyojhyu) here.
+Download input [CUT&Tag](https://www.dropbox.com/scl/fi/nyonvtpe8pdhm607vd151/H3K27me3_CUTTag_rep1.bed.gz) and [ATAC](https://www.dropbox.com/scl/fi/gxqxljiv6mr68l92e4hsm/ATAC.bed.gz) data, and example [output](https://www.dropbox.com/scl/fi/cavku8dzgydwj1t26wt9w/testbulk_correctSig.bw) here.
 
+<<<<<<< HEAD
 PATTY Manuscript Source Data and Figure Generation Code can be found in https://github.com/zang-lab/PATTY_figure_scripts
+=======
+Users can reproduce other results and figures with the scripts in this [Reproduction Instructions] (https://github.com/zang-lab/PATTY_figure_scripts).
+>>>>>>> 9ad3e3c (v1.1 update for NC paper)
