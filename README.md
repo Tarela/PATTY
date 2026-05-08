@@ -158,4 +158,4 @@ $ PATTY -m bulk -c ${path}/H3K27me3_CUTTag_rep1.bed.gz -a ${path}/ATAC.bed.gz -f
 Download input [CUT&Tag](https://www.dropbox.com/scl/fi/nyonvtpe8pdhm607vd151/H3K27me3_CUTTag_rep1.bed.gz) and [ATAC](https://www.dropbox.com/scl/fi/gxqxljiv6mr68l92e4hsm/ATAC.bed.gz) data, and example [output](https://www.dropbox.com/scl/fi/cavku8dzgydwj1t26wt9w/testbulk_correctSig.bw) here.
 
 ### PATTY Manuscript Source Data and Figure Generation Code
-Users can reproduce other results and figures with the scripts in this [Reproduction Instructions] (https://github.com/zang-lab/PATTY_figure_scripts).
+Users can reproduce other results and figures with the scripts in this [Reproduction Instructions](https://github.com/zang-lab/PATTY_figure_scripts).
