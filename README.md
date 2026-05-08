@@ -21,9 +21,9 @@ v1.1 Improve the installation steps. Designed for paper revision.
 - Package requirements<br>
 PATTY requires Linux or MacOS as OS.<br>
 PATTY requires [Python](https://www.python.org) 3.6+ and [Rscript](https://www.r-project.org) v3+ to run.<br>
-PATTY requires Python packages [scipy](https://scipy.org), [numpy](https://numpy.org), [pandas](https://pandas.pydata.org/), and [joblib](https://joblib.readthedocs.io/) pre-installed. <br>
+PATTY requires Python packages [scipy](https://scipy.org), [numpy](https://numpy.org), [scikit-learn](https://scikit-learn.org/stable/), and [joblib](https://joblib.readthedocs.io/) pre-installed. <br>
 PATTY requires Bedtools (Quinlan et al., Bioinformatics, 2010) and UCSC tools (Kuhn et al., Brief Bioinform. 2013) pre-installed. <br>
-PATTY sc mode requires Rpackage [ArchR](https://www.archrproject.com/) pre-installed.
+PATTY sc mode requires Rpackage [ArchR](https://www.archrproject.com/), [pandas](https://pandas.pydata.org/), [tabix](http://www.htslib.org/doc/tabix.html), and [bgzip](http://www.htslib.org/doc/bgzip.html) pre-installed.
 
 - Genome-wide mappable region annotation<br>
 The genome-wide annotation file for [hg38](https://www.dropbox.com/scl/fi/k6iwvr0rh7ozycxv8u8fh/hg38_mappableBin.bed.gz) and [mm10](https://www.dropbox.com/scl/fi/1fa3ji3pmurreb05lopos/mm10_mappableBin.bed.gz) genome can be downloaded here and input when running PATTY.
@@ -153,7 +153,7 @@ You can also set the following parameters for more accurate bias estimation and 
 ## 8. Reproduce figure results from the PATTY manuscript
 Users can reproduce the bias correction results from the manuscript (Figure 4A, G, H, H3K27me3 CUT&Tag rep1) by running PATTY with the following command line:
 ```sh
-$ PATTY -m bulk -c ${path}/H3K27me3_CUTTag_rep1.bed.gz -a ${path}/ATAC.bed.gz -f H3K27me3 -o bulkH3K27me3  
+$ PATTY -m bulk -c ${path}/H3K27me3_CUTTag_rep1.bed.gz -a ${path}/ATAC.bed.gz -f H3K27me3 -o testbulk -g hg38 -b hg38_mappableBin.bed.gz
 ```
 Download input [CUT&Tag](https://www.dropbox.com/scl/fi/nyonvtpe8pdhm607vd151/H3K27me3_CUTTag_rep1.bed.gz) and [ATAC](https://www.dropbox.com/scl/fi/gxqxljiv6mr68l92e4hsm/ATAC.bed.gz) data, and example [output](https://www.dropbox.com/scl/fi/cavku8dzgydwj1t26wt9w/testbulk_correctSig.bw) here.
 

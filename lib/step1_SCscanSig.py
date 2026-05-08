@@ -9,7 +9,7 @@ import sys
 import string
 import time
 import pandas as pd
-import numpy
+import numpy as np
 import copy,random
 from joblib import load
 # --------------------------
@@ -23,6 +23,7 @@ from PATTYpipe.Utility      import (sp,
                                    open_bed_file,
                                    add_coverPos,
                                    read_in_reads,
+                                   read_in_reads_sc,
                                    scProcess)
 
 # -------------------------- 
@@ -45,8 +46,8 @@ def step1_SCscanSig(conf_dict,logfile):
     rawbinFile = "tmp_scProcess/tmp_highVarBin.bed"
     #else:
     #    rawbinFile = conf_dict['options']['binlist']
-    cmd = """%s intersect -a <(zcat %s) -b %s -u > tmp_usebins.bed"""%(conf_dict['General']['bedtools'],conf_dict['General']['genomebin'],rawbinFile)
-    tmplog = sp(cmd)
+    cmd = """zcat %s | %s intersect -a stdin -b %s -u > tmp_usebins.bed""" %(conf_dict['General']['genomebin'],conf_dict['General']['bedtools'],rawbinFile)
+    tmplog = sp(cmd)#, logfile)
     binFile = "tmp_usebins.bed"
 
     # get cell-cell distance and target cell list :
@@ -90,7 +91,7 @@ def step1_SCscanSig(conf_dict,logfile):
     CnT_total = {}
     for this_cell in cell_list:
         CnT_total[this_cell] = 0
-    [binSigCnT, CnT_total] = read_in_reads_sc(conf_dict['General']['cuttag'], binSigCnT, CnT_total)
+    [binSigCnT, CnT_total] = read_in_reads_sc(conf_dict['General']['cuttag'], binSigCnT, CnT_total, cell_list)
 
     ### assign ATAC real bin value
     binSigATAC_real = np.zeros((len(binList_real), 100))
@@ -163,8 +164,7 @@ def step1_SCscanSig(conf_dict,logfile):
         sigdata_flat = sigdata_ext.reshape(sigdata_ext.shape[0], -1)
         y_pred = model.predict_proba(sigdata_flat)[:, 1]
         metaCellPrediction[:,this_cell_idx] = y_pred
-    
-    np.savetxt("%s_correctMat.txt"%conf_dict['General']['outname'], metaCellPrediction, delimiter="\t")
+    np.savetxt("%s_correctMat.txt"%conf_dict['General']['outname'], metaCellPrediction, delimiter="\t",fmt="%.3e")
     return conf_dict
 
 

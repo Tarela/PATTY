@@ -194,17 +194,20 @@ def add_coverPos_sc(Read_cover_list,cellIdx,chrm,binSig):
     if (Read_cover_list[-1] - (bin2 + 100) ) >= 0:
         bin3 = bin2+100
         bin3_name = chrm+":"+str(bin3)+"-"+str(bin3+100)
-        if bin3_name in binSigH3K27me3:
+        if bin3_name in binSig:
             binSig[bin3_name][cellIdx,0: min((Read_cover_list[-1] - bin3 + 1),100)] += 1
     return binSig
 
-def read_in_reads_sc(readFile,binSig, total_reads_count):
+def read_in_reads_sc(readFile,binSig, total_reads_count, cell_list):
     random.seed(1)
     with open_bed_file(readFile) as inf:
         for line in inf:
             ll = line.split()
             reads_chrm = ll[0]
             reads_cell = ll[3]
+            if not reads_cell in cell_list:
+                continue
+            cellindex = cell_list.index(reads_cell)
             if not reads_cell in total_reads_count.keys():
                 continue
             total_reads_count[reads_cell]  += 1
@@ -216,7 +219,7 @@ def read_in_reads_sc(readFile,binSig, total_reads_count):
                 reads_cover1 = list(range(plus, plus+146))
             else:
                 reads_cover1 = list(range(minus-146,minus))
-            binSig = add_coverPos_sc(reads_cover1,reads_cell,reads_chrm,binSig)
+            binSig = add_coverPos_sc(reads_cover1,cellindex,reads_chrm,binSig)
     return [binSig,total_reads_count]
 
 

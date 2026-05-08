@@ -75,7 +75,7 @@ def main():
         bdg2bw_software = "bedGraphToBigWig_linux"
                 
     setup(name="PATTY",
-          version="1.0",
+          version="1.1",
           description="PATTY: correct open chromatin bias for CUT&Tag data ",
           author='Shengen Shawn Hu',
           author_email='sh8tv@virginia.edu',
