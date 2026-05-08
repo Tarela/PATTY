@@ -21,8 +21,8 @@ v1.1 Improve the installation steps. Designed for paper revision.
 - Package requirements<br>
 PATTY requires Linux or MacOS as OS.<br>
 PATTY requires [Python](https://www.python.org) 3.6+ and [Rscript](https://www.r-project.org) v3+ to run.<br>
-PATTY requires Python packages [scipy](https://scipy.org), [numpy](https://numpy.org), [pandas](https://pandas.pydata.org/), and [joblib](https://joblib.readthedocs.io/) pre-installed.
-PATTY requires Bedtools (Quinlan et al., Bioinformatics, 2010) and UCSC tools (Kuhn et al., Brief Bioinform. 2013) pre-installed.
+PATTY requires Python packages [scipy](https://scipy.org), [numpy](https://numpy.org), [pandas](https://pandas.pydata.org/), and [joblib](https://joblib.readthedocs.io/) pre-installed. <br>
+PATTY requires Bedtools (Quinlan et al., Bioinformatics, 2010) and UCSC tools (Kuhn et al., Brief Bioinform. 2013) pre-installed. <br>
 PATTY sc mode requires Rpackage [ArchR](https://www.archrproject.com/) pre-installed.
 
 - Genome-wide mappable region annotation<br>
@@ -157,8 +157,5 @@ $ PATTY -m bulk -c ${path}/H3K27me3_CUTTag_rep1.bed.gz -a ${path}/ATAC.bed.gz -f
 ```
 Download input [CUT&Tag](https://www.dropbox.com/scl/fi/nyonvtpe8pdhm607vd151/H3K27me3_CUTTag_rep1.bed.gz) and [ATAC](https://www.dropbox.com/scl/fi/gxqxljiv6mr68l92e4hsm/ATAC.bed.gz) data, and example [output](https://www.dropbox.com/scl/fi/cavku8dzgydwj1t26wt9w/testbulk_correctSig.bw) here.
 
-<<<<<<< HEAD
-PATTY Manuscript Source Data and Figure Generation Code can be found in https://github.com/zang-lab/PATTY_figure_scripts
-=======
+### PATTY Manuscript Source Data and Figure Generation Code
 Users can reproduce other results and figures with the scripts in this [Reproduction Instructions] (https://github.com/zang-lab/PATTY_figure_scripts).
->>>>>>> 9ad3e3c (v1.1 update for NC paper)

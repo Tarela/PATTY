@@ -186,6 +186,9 @@ def step0_check_data(conf_dict,logfile):
             else:
                 wlog("cellnames file %s not found, ignore --cellnames parameter"%(conf_dict['options']["cellnames"]),logfile)
                 conf_dict['options']["usecells"] = []
+        else:
+            conf_dict['options']["usecells"] = []
+
 
     ### check trained model file
     conf_dict['General']['model'] = PATTYpipe.__path__[0]+"/refdata/%s_LR_CnTATAC_model.joblib"%(conf_dict['General']["factor"])
